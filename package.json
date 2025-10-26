@@ -7,10 +7,12 @@
     "build": "node build.js",
     "start": "npm run build && echo 'Build complete. Open index.html in your browser.'"
   },
-  "author": "WS",
+  "author": "",
   "license": "ISC",
   "dependencies": {
-    "@dataconnect/generated": "file:src/dataconnect-generated",
     "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }
