@@ -1,0 +1,11 @@
+# Node.js
+node_modules/
+npm-debug.log
+
+# Environment Variables
+# Ignore local environment variables file
+.env
+
+# Generated Files
+# Ignore the generated firebase config file
+shared/firebase-init.js

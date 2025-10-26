@@ -1,0 +1,16 @@
+{
+  "name": "ai-day-2025-insights-platform",
+  "version": "2.0.0",
+  "description": "A real-time audience interaction and data visualization platform.",
+  "main": "index.html",
+  "scripts": {
+    "build": "node build.js",
+    "start": "npm run build && echo 'Build complete. Open index.html in your browser.'"
+  },
+  "author": "WS",
+  "license": "ISC",
+  "dependencies": {
+    "@dataconnect/generated": "file:src/dataconnect-generated",
+    "dotenv": "^16.3.1"
+  }
+}

@@ -1,0 +1,161 @@
+.container {
+    max-width: 700px;
+    margin: 4rem auto;
+    padding: 2rem;
+    flex-grow: 1;
+}
+
+.main-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.main-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* --- NEW: Style the header's instructional paragraph --- */
+.main-header p {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    max-width: 550px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.input-wrapper textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-background-secondary);
+    font-size: 1rem;
+    resize: vertical;
+    color: var(--color-text-primary);
+}
+
+/* --- NEW: Improve placeholder text visibility --- */
+.input-wrapper textarea::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.8;
+}
+
+.input-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+#charCounter {
+    color: var(--color-text-secondary);
+}
+
+/* Success State Styles */
+#success-state {
+    text-align: center;
+    animation: fadeInUp 0.5s ease;
+}
+
+.success-icon {
+    font-size: 3rem;
+    color: var(--color-accent-green);
+    background: rgba(45, 211, 111, 0.1);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+}
+
+.submitted-question {
+    background: var(--color-background-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.submitted-question blockquote {
+    margin: 0;
+    font-style: italic;
+    color: var(--color-text-secondary);
+}
+
+.next-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- NEW: Styles for Real-time Theme Suggestion --- */
+.theme-suggestion {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(56, 189, 248, 0.1);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-small);
+    color: var(--color-text-primary);
+    animation: fadeInUp 0.3s ease;
+}
+
+.theme-suggestion .confidence {
+    margin-left: auto;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+
+/* --- Footer Styles --- */
+.site-footer {
+    width: 100%;
+    padding: var(--space-lg) 0;
+    
+    /* MODIFIED: Deeper, near-black background to match the logo image */
+    background-color: rgba(5, 7, 13, 0.85); /* A very dark blue-charcoal with transparency */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    /* NEW: Replaced the border with a high-fidelity glowing effect */
+    box-shadow: inset 0 1px 0 rgba(56, 189, 248, 0.15), 
+                0 -4px 20px -5px rgba(56, 189, 248, 0.2);
+    
+    text-align: center;
+    margin-top: 4rem;
+}
+
+.footer-container {
+    max-width: 800px; /* Or your preferred width */
+    margin: 0 auto;
+    padding: 0 var(--space-md);
+}
+
+.footer-logo {
+    /* This style is now just for layout, as the logo is an image */
+    margin-bottom: var(--space-xs);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer-text {
+    font-size: var(--font-small);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.5px;
+}
+
+.footer-text .footer-brand {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}

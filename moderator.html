@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderator | AI Day 2025</title>
+    <link rel="stylesheet" href="shared/style.css">
+    <link rel="stylesheet" href="css/moderator.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+</head>
+<body class="moderator-mode">
+    <canvas id="background-canvas"></canvas> 
+    <div class="moderator-container">
+        <h1>Moderation Queue</h1>
+        <p>Approve or reject new submissions to display them on the main screen.</p>
+        <div class="queue-stats">
+            Pending Review: <span id="pending-count">0</span>
+        </div>
+        <div id="pending-queue" class="pending-queue">
+            <!-- Pending submission cards will be injected here -->
+        </div>
+    </div>
+    
+    <!-- Shared Scripts -->
+    <!-- FIX: Added config.js and ensured it loads BEFORE storage.js -->
+    <script src="shared/firebase-init.js"></script> 
+    <script src="shared/config.js"></script>
+    <script src="shared/storage.js"></script>
+    <script src="shared/background-animation.js"></script>
+    <!-- Page-specific Script -->
+    <script src="js/moderator.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('background-canvas');
+            new FlowingDataStreams(canvas);
+        });
+    </script>
+</body>
+</html>

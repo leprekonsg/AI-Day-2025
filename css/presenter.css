@@ -1,0 +1,224 @@
+/* Presenter Mode Dashboard Styles */
+body.presenter-mode {
+    background: #0D1117;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+}
+.presenter-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 2rem 3rem;
+}
+.presenter-header {
+    flex-shrink: 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+}
+#current-view-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 1rem 0;
+}
+.progress-bar-container {
+    background: var(--color-border);
+    border-radius: 4px;
+    height: 8px;
+}
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-orange));
+    border-radius: 4px;
+}
+.visualization-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+    animation: fadeInUp 0.8s ease;
+}
+.presenter-footer {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+.qr-code img {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+}
+.cta-text h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.cta-text p {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+}
+.progress-bar.active {
+    animation: fill-progress 15s linear forwards;
+}
+@keyframes fill-progress {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+/* --- Styles for Bar Chart View --- */
+.bar-chart-container {
+    width: 100%;
+    max-width: 1000px;
+}
+.bar-item {
+    margin-bottom: 1.25rem;
+    animation: fadeInUp 0.5s ease forwards;
+}
+.bar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: var(--space-xs);
+}
+.bar-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.bar-count {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+}
+.bar-fill-container {
+    height: 32px;
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+}
+.bar-fill {
+    height: 100%;
+    background: var(--color-accent-cyan);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--color-background-primary);
+    transition: width 0.8s ease;
+}
+
+.confidence-badge {
+    font-size: var(--font-small);
+    color: var(--color-text-secondary);
+    background: rgba(56, 189, 248, 0.1);
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: var(--space-sm);
+}
+
+.bar-sentiment {
+    display: flex;
+    gap: var(--space-xs);
+}
+.sentiment-badge {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border-radius: 16px;
+    font-weight: 500;
+}
+.sentiment-badge.positive { background: rgba(45, 211, 111, 0.15); color: var(--color-accent-green); }
+.sentiment-badge.negative { background: rgba(235, 68, 90, 0.15); color: var(--color-accent-red); }
+.sentiment-badge.neutral { background: rgba(139, 148, 158, 0.15); color: var(--color-text-secondary); }
+.sentiment-badge.concern { background: rgba(245, 158, 11, 0.15); color: var(--color-accent-orange); }
+
+.bar-sample {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    margin-top: var(--space-xs);
+    padding-left: var(--space-sm);
+    border-left: 2px solid var(--color-border);
+}
+
+/* --- Styles for Word Cloud View --- */
+.word-cloud-container {
+    width: 100%;
+    height: 100%;
+    max-width: 1000px;
+    position: relative;
+}
+.cloud-word {
+    position: absolute;
+    white-space: nowrap;
+    opacity: 0; /* Initially hidden */
+    transition: transform 0.3s ease, opacity 0.5s ease;
+}
+.cloud-word.placed {
+    /* Animation is triggered by adding this class */
+    animation: fadeInUp 0.8s ease forwards;
+}
+.cloud-word:hover {
+    transform: scale(1.1);
+    z-index: 10;
+}
+.cloud-word.t-cyan { color: var(--color-accent-cyan); }
+.cloud-word.t-orange { color: var(--color-accent-orange); }
+.cloud-word.t-primary { color: var(--color-text-primary); }
+.cloud-word.t-secondary { color: var(--color-text-secondary); }
+
+
+/* --- Styles for Sentiment Overview --- */
+.sentiment-overview {
+    width: 100%;
+    max-width: 800px;
+}
+.sentiment-bar {
+    display: flex;
+    height: 40px;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    margin-bottom: var(--space-lg);
+}
+.sentiment-fill {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 600;
+    transition: width 0.8s ease;
+}
+.sentiment-fill.positive { background-color: var(--color-accent-green); }
+.sentiment-fill.negative { background-color: var(--color-accent-red); }
+.sentiment-fill.neutral { background-color: var(--color-text-secondary); }
+.sentiment-fill.concern { background-color: var(--color-accent-orange); }
+
+.sentiment-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 1.1rem;
+}
+.legend-item span {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+.legend-item.positive span { background-color: var(--color-accent-green); }
+.legend-item.negative span { background-color: var(--color-accent-red); }
+.legend-item.neutral span { background-color: var(--color-text-secondary); }
+.legend-item.concern span { background-color: var(--color-accent-orange); }

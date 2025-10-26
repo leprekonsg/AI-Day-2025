@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Day 2025 | Ask a Question</title>
+    <link rel="stylesheet" href="shared/style.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- ADDED: Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <canvas id="background-canvas"></canvas> 
+    <div class="container">
+        <div class="content-wrapper fade-in-up">
+            <!-- Submission Form State -->
+            <div id="submission-state">
+                <header class="main-header">
+                    <h1>Ask the Experts</h1>
+                    <p>Your questions shape the conversation. Submit your thoughts below.</p>
+                </header>
+                <main>
+                    <form id="submissionForm" class="input-wrapper">
+                        <textarea id="questionInput" placeholder="e.g., How will AI impact supply chain logistics?" maxlength="500"></textarea>
+                        <div class="input-footer">
+                            <span id="charCounter">0 / 500</span>
+                            <button type="submit" class="btn primary-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                <span>Submit Question</span>
+                            </button>
+                        </div>
+                    </form>
+                </main>
+            </div>
+
+            <!-- Success State (Initially Hidden) -->
+            <div id="success-state" class="hidden">
+                <div class="success-icon">✓</div>
+                <h1>Thank You!</h1>
+                <p>Your question has been sent to the moderation queue.</p>
+                <div class="submitted-question">
+                    <p><strong>Your Submission:</strong></p>
+                    <blockquote id="submitted-text"></blockquote>
+                </div>
+                <div class="next-actions">
+                    <button id="askAnotherBtn" class="btn secondary-btn">Ask Another Question</button>
+                    <a href="presenter.html" class="btn primary-btn">View Live Feed</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/compromise"></script>
+
+    <!-- Shared Scripts -->
+    <script src="shared/firebase-init.js"></script> 
+    <script src="shared/config.js"></script>
+    <script src="shared/modeler.js"></script>
+    <script src="shared/storage.js"></script>
+    <script src="shared/background-animation.js"></script>
+    <script src="shared/theme-data.js"></script> 
+    <!-- Page-specific Script -->
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('background-canvas');
+            new FlowingDataStreams(canvas);
+        });
+    </script>
+    <footer class="site-footer">
+        <div class="footer-container">
+            <!-- 
+                Logo Section: 
+                You can replace the text-based logo below with your own <img> tag.
+                Example: <img src="img/your-logo-white.png" alt="AI Day Logo" style="height: 40px;" />
+            -->
+            <div class="footer-logo">
+                 <img src="img/logo.png" alt="SPARK Logo" style="height: 35px; width: auto;">
+            </div>
+            
+            <!-- Copyright Text -->
+            <div class="footer-text">
+                &copy; <span id="footer-year">2025</span> <span class="footer-brand">STF</span> - ST Logistics AI Conference
+            </div>
+        </div>
+    </footer>
+
+    <!-- Small script to dynamically update the year -->
+    <script>
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
