@@ -1,5 +1,3 @@
-name: Azure Static Web Apps CI/CD
-
 on:
   push:
     branches:
@@ -15,29 +13,22 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
 
-      # --- Setup Node.js Environment ---
-      # This step prepares the build server with the correct Node.js version.
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
         with:
-          # This will respect the "engines" field in your package.json
           node-version-file: 'package.json'
-          cache: 'npm' # Caches dependencies for faster builds
+          cache: 'npm'
 
-      # --- Install Dependencies ---
       - name: Install Dependencies
         run: npm install
 
-      # --- Run Your Build Script ---
       - name: Build Firebase Config
         run: npm run build
         env:
-          # This 'env' block securely maps your GitHub repository secrets
-          # to the environment variables that your build.js script needs.
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
@@ -45,19 +36,16 @@ jobs:
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 
-      # --- MODIFIED: Simplified Build and Deploy Step ---
       - name: Build and Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # IMPORTANT: Use your actual secret name here.
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_WATER_014D36300 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # This is automatically generated
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations ######
-          app_location: "/" # App source code path
-          api_location: "" # No API for this project
-          output_location: "" # The app is built in the root, so no separate output folder
+          app_location: "/"
+          api_location: ""
+          output_location: ""
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -68,6 +56,5 @@ jobs:
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
-          # IMPORTANT: Use your actual secret name here.
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_WATER_014D36300 }}
           action: "close"
