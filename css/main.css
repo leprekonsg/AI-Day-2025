@@ -135,12 +135,38 @@
     margin-top: 4rem;
 }
 
+/* ADDED: Styles for the new post-submission feedback area */
+#post-submission-feedback {
+    text-align: center;
+    margin-top: var(--space-md);
+    font-size: var(--font-caption);
+    color: var(--color-text-secondary);
+    min-height: 24px; /* Prevents layout shift when message appears */
+    transition: opacity 0.5s ease;
+}
+
+#post-submission-feedback a {
+    color: var(--color-accent-cyan);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+#post-submission-feedback a:hover {
+    border-bottom-color: var(--color-accent-cyan);
+}
+
 .footer-container {
     max-width: 800px; /* Or your preferred width */
     margin: 0 auto;
     padding: 0 var(--space-md);
 }
-
+/* ADDED: Style for the button's success state */
+.btn.success {
+    background: linear-gradient(135deg, var(--color-success), rgba(0, 229, 160, 0.8));
+    color: var(--color-bg-primary);
+}
 .footer-logo {
     /* This style is now just for layout, as the logo is an image */
     margin-bottom: var(--space-xs);

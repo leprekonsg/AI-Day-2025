@@ -22,6 +22,47 @@ body.presenter-mode {
     text-align: center;
     margin: 0 0 1rem 0;
 }
+
+/* ADDED: Styles for the new Presenter Controls */
+#presenter-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.presenter-control-btn {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.presenter-control-btn:hover {
+    background-color: var(--color-background-secondary);
+    color: var(--color-accent-cyan);
+    border-color: var(--color-accent-cyan);
+    transform: scale(1.1);
+}
+
+.presenter-control-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.presenter-control-btn.hidden {
+    display: none;
+}
+
 .progress-bar-container {
     background: var(--color-border);
     border-radius: 4px;
@@ -70,6 +111,86 @@ body.presenter-mode {
 @keyframes fill-progress {
     from { width: 0%; }
     to { width: 100%; }
+}
+
+/* MODIFIED: Replace all old .summary-panel, .summary-section, etc. styles with these */
+.summary-panel.executive-briefing {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.insight-card {
+    background: rgba(20, 24, 34, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-md);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.insight-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-sm) 0;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.hotspot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 1rem;
+    padding: var(--space-xs);
+}
+
+.hotspot-icon {
+    font-size: 1.5rem;
+}
+
+.hotspot.positive {
+    color: var(--color-accent-green);
+}
+
+.hotspot.concern {
+    color: var(--color-accent-orange);
+}
+
+.discussion-point {
+    margin-bottom: var(--space-sm);
+}
+.discussion-point:last-child {
+    margin-bottom: 0;
+}
+
+.discussion-point h5 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-accent-cyan);
+    margin: 0 0 var(--space-xs) 0;
+}
+
+.representative-quote {
+    margin: 0;
+    padding-left: var(--space-sm);
+    border-left: 3px solid var(--color-border-hover);
+    font-style: italic;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+.summary-footer {
+    margin-top: var(--space-md);
+    text-align: center;
+    font-size: var(--font-small);
+    color: var(--color-text-secondary);
 }
 
 /* --- Styles for Bar Chart View --- */

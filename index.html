@@ -17,10 +17,15 @@
         <div class="content-wrapper fade-in-up">
             <!-- Submission Form State -->
             <div id="submission-state">
+                
+                <!-- START: New Header from Generated File -->
                 <header class="main-header">
-                    <h1>Ask the Experts</h1>
-                    <p>Your questions shape the conversation. Submit your thoughts below.</p>
+                    <div class="logo"><div class="logo-shape"></div></div>
+                    <h1>AI Conference 2025</h1>
+                    <p class="subtitle">Your questions shape the conversation. Submit your thoughts below.</p>
                 </header>
+                <!-- END: New Header -->
+
                 <main>
                     <form id="submissionForm" class="input-wrapper">
                         <textarea id="questionInput" placeholder="e.g., How will AI impact supply chain logistics?" maxlength="500"></textarea>
@@ -32,10 +37,11 @@
                             </button>
                         </div>
                     </form>
+                    <div id="post-submission-feedback"></div>
                 </main>
             </div>
 
-            <!-- Success State (Initially Hidden) -->
+            <!-- Success State (Initially Hidden)
             <div id="success-state" class="hidden">
                 <div class="success-icon">✓</div>
                 <h1>Thank You!</h1>
@@ -48,7 +54,7 @@
                     <button id="askAnotherBtn" class="btn secondary-btn">Ask Another Question</button>
                     <a href="presenter.html" class="btn primary-btn">View Live Feed</a>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -72,23 +78,16 @@
     </script>
     <footer class="site-footer">
         <div class="footer-container">
-            <!-- 
-                Logo Section: 
-                You can replace the text-based logo below with your own <img> tag.
-                Example: <img src="img/your-logo-white.png" alt="AI Day Logo" style="height: 40px;" />
-            -->
             <div class="footer-logo">
                  <img src="img/logo.png" alt="SPARK Logo" style="height: 35px; width: auto;">
             </div>
             
-            <!-- Copyright Text -->
             <div class="footer-text">
                 &copy; <span id="footer-year">2025</span> <span class="footer-brand">STF</span> - ST Logistics AI Conference
             </div>
         </div>
     </footer>
 
-    <!-- Small script to dynamically update the year -->
     <script>
         document.getElementById('footer-year').textContent = new Date().getFullYear();
     </script>

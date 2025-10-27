@@ -6,6 +6,7 @@
 /* ============================================= */
 
 const THEME_ICONS = {
+    'Company & Strategy': '🏢',
     'Automation & AI': '🤖',
     'Efficiency & Optimization': '⚙️',
     'Innovation & Future': '🚀',

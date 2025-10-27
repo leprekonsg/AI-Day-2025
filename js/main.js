@@ -6,10 +6,9 @@ class AIInsightsCollector {
         this.submissionForm = document.getElementById('submissionForm');
         this.questionInput = document.getElementById('questionInput');
         this.charCounter = document.getElementById('charCounter');
-        this.submissionState = document.getElementById('submission-state');
-        this.successState = document.getElementById('success-state');
-        this.submittedText = document.getElementById('submitted-text');
-        this.askAnotherBtn = document.getElementById('askAnotherBtn');
+        this.submitBtn = this.submissionForm.querySelector('button[type="submit"]');
+        this.originalBtnHTML = this.submitBtn.innerHTML;
+        this.feedbackArea = document.getElementById('post-submission-feedback'); // ADDED: Get the new element
 
         this.initEventListeners();
     }
@@ -18,14 +17,18 @@ class AIInsightsCollector {
         this.submissionForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = this.questionInput.value.trim();
-            if (text) {
-                await this.addSubmission(text);
-                this.showSuccessState(text);
+            if (text.length > 10 && !this.submitBtn.disabled) {
+                await this.handleSubmission(text);
             }
         });
 
         let typingTimer;
         this.questionInput.addEventListener('input', () => {
+            // ADDED: Clear feedback when user starts typing again
+            if (this.feedbackArea.innerHTML !== '') {
+                this.feedbackArea.innerHTML = '';
+            }
+
             const text = this.questionInput.value;
             const length = text.length;
             this.charCounter.textContent = `${length} / 500`;
@@ -38,14 +41,32 @@ class AIInsightsCollector {
                         this.showThemeSuggestion(themeResult);
                     }
                 }, 500);
+            } else {
+                this.removeThemeSuggestion();
             }
-        });
-
-        this.askAnotherBtn.addEventListener('click', () => {
-            this.resetForm();
         });
     }
 
+    async handleSubmission(text) {
+        this.submitBtn.disabled = true;
+        this.submitBtn.innerHTML = `<span>Processing...</span>`;
+
+        const themeResult = await this.addSubmission(text);
+
+        this.submitBtn.classList.add('success');
+        this.submitBtn.innerHTML = `<span>✓ Added to ${themeResult.theme}</span>`;
+
+        // MODIFIED: Show the link after a short delay
+        setTimeout(() => {
+            this.feedbackArea.innerHTML = `Thank you! Your insight is in the review queue. <a href="presenter.html" target="_blank">View the live feed</a>.`;
+        }, 500);
+
+        setTimeout(() => {
+            this.resetForm();
+        }, 2500);
+    }
+
+    // ... (addSubmission method is unchanged) ...
     async addSubmission(text) {
         this.topicModeler.updateCorpusStats(text);
 
@@ -56,7 +77,7 @@ class AIInsightsCollector {
 
         const submission = {
             text,
-            id: Date.now(), // Still useful for non-DB identification if needed
+            id: Date.now(),
             timestamp: new Date().toISOString(),
             theme: themeResult.theme,
             sentiment: sentimentResult.sentiment,
@@ -66,27 +87,25 @@ class AIInsightsCollector {
             confidence: themeResult.confidence,
             status: 'pending'
         };
-        // This is now an async call
+        
         await this.storage.addSubmission(submission);
+        return themeResult;
     }
 
-    showSuccessState(text) {
-        this.submittedText.textContent = text;
-        this.submissionState.classList.add('hidden');
-        this.successState.classList.remove('hidden');
-    }
 
     resetForm() {
         this.questionInput.value = '';
         this.charCounter.textContent = '0 / 500';
-        this.successState.classList.add('hidden');
-        this.submissionState.classList.remove('hidden');
+        this.submitBtn.classList.remove('success');
+        this.submitBtn.innerHTML = this.originalBtnHTML;
+        this.submitBtn.disabled = false;
+        this.removeThemeSuggestion();
+        // NOTE: We intentionally leave the feedback message visible until the user types again.
     }
 
+    // ... (showThemeSuggestion and removeThemeSuggestion methods are unchanged) ...
     showThemeSuggestion(themeResult) {
-        const existingSuggestion = document.querySelector('.theme-suggestion');
-        if (existingSuggestion) existingSuggestion.remove();
-
+        this.removeThemeSuggestion();
         const suggestion = document.createElement('div');
         suggestion.className = 'theme-suggestion';
         const icon = THEME_ICONS[themeResult.theme] || '💡';
@@ -95,16 +114,14 @@ class AIInsightsCollector {
             <span>Detected Theme: <strong>${themeResult.theme}</strong></span>
             <span class="confidence">${Math.round(themeResult.confidence * 100)}%</span>
         `;
+        this.submissionForm.appendChild(suggestion);
+    }
 
-        const inputWrapper = document.querySelector('.input-wrapper');
-        inputWrapper.appendChild(suggestion);
-
-        setTimeout(() => {
-            if (suggestion) {
-                suggestion.style.opacity = '0';
-                setTimeout(() => suggestion.remove(), 300);
-            }
-        }, 4000);
+    removeThemeSuggestion() {
+        const existingSuggestion = document.querySelector('.theme-suggestion');
+        if (existingSuggestion) {
+            existingSuggestion.remove();
+        }
     }
 }
 

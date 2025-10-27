@@ -6,48 +6,99 @@
 /* ============================================= */
 
 /* --- Design System: Variables --- */
+/* MODIFIED: Replace the entire :root block with this */
 :root {
-    /* Colors */
-    --color-background-primary: #0D1117;
-    --color-background-secondary: #161B22;
-    --color-border: #30363D;
-    --color-text-primary: #E6EDF3;   /* MODIFIED */
-    --color-text-secondary: #A1AAB4; /* MODIFIED */
-    --color-accent-cyan: #38BDF8;
-    --color-accent-orange: #F59E0B;
-    --color-accent-green: #2DD36F;
-    --color-accent-red: #EB445A;
+    /* Color System */
+    --color-bg-primary: #0B0F1A;
+    --color-bg-surface: #141822;
+    --color-accent-cyan: #00D4FF;
+    --color-accent-orange: #FF8C42;
+    --color-success: #00E5A0;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #8B92AB;
+    --color-border: rgba(0, 212, 255, 0.15);
+    --color-border-hover: rgba(0, 212, 255, 0.3);
+    --color-accent-red: #EB445A; /* Kept from original for negative sentiment */
+    --color-accent-green: #2DD36F; /* Kept from original for positive sentiment */
 
     /* Typography */
-    --font-family-sans: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-small: 0.875rem;
-    --font-caption: 1rem;
+    --font-family-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', 'Segoe UI', sans-serif;
+    --font-body: 16px;
+    --font-caption: 14px;
+    --font-small: 12px;
 
     /* Spacing */
-    --space-xs: 0.5rem;
-    --space-sm: 0.75rem;
-    --space-md: 1rem;
-    --space-lg: 1.5rem;
-    --space-xl: 2rem;
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 32px;
+    --space-xl: 48px;
 
-    /* Transitions & Borders */
-    --transition-base: 0.3s ease;
+    /* Effects & Transitions */
+    --transition-base: 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
     --border-radius-sm: 4px;
     --border-radius-md: 8px;
     --border-radius-lg: 12px;
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.2);
+}
+
+
+.main-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-top: 4rem; /* Added padding to give it space */
+}
+
+.logo {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.5rem; /* Replaced var(--space-lg) */
+    position: relative;
+}
+
+.logo-shape {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-accent-cyan), var(--color-accent-orange));
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+    animation: logoFloat 6s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.main-header h1 {
+    font-size: 2.8rem; /* Adjusted size */
+    font-weight: 300; /* Lighter font weight for modern look */
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem; /* Replaced var(--space-xs) */
+}
+
+.main-header .subtitle {
+    color: var(--color-text-secondary);
+    font-size: 1.1rem; /* Adjusted size */
+    font-weight: 400;
+    max-width: 550px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* --- Base & Reset Styles --- */
 * { box-sizing: border-box; }
 body {
     font-family: var(--font-family-sans);
-    background-color: var(--color-background-primary);
+    background-color: var(--color-bg-primary); /* MODIFIED */
     color: var(--color-text-primary);
     margin: 0;
     line-height: 1.6;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 h1, h2, h3, h4, p { margin: 0 0 1rem 0; }
 h1 { font-size: 2.2rem; }

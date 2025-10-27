@@ -1,7 +1,13 @@
 class EnhancedTopicModeler {
-    constructor() {
+    constructor(persistToLocalStorage = true) {
+        this.persistToLocalStorage = persistToLocalStorage; // ADDED: Store the setting
         this.storageKey = `${APP_CONFIG.storageKey}_corpus`;
         this.themeDefinitions = {
+            'Company & Strategy': { 
+                exact: ['stl'], 
+                partial: ['st logistics', 'stlogistics', 'our company', 'business model', 'strategy'], 
+                weight: 1.5 // Give it a higher weight to prioritize company questions
+            },
             'Automation & AI': { exact: ['ai', 'ml', 'llm', 'gpt', 'bot'], partial: ['automat', 'robot', 'artificial', 'machine', 'learning', 'algorithm', 'neural', 'intelligence', 'smart', 'autonomous'], weight: 1.2 },
             'Efficiency & Optimization': { exact: ['kpi', 'roi', 'sla'], partial: ['efficien', 'optimiz', 'speed', 'fast', 'quick', 'performance', 'cost', 'reduc', 'streamlin', 'productiv', 'improv', 'better', 'faster', 'cheaper', 'lean', 'waste'] },
             'Innovation & Future': { exact: ['new', '5g', 'iot'], partial: ['innovat', 'transform', 'future', 'cutting', 'edge', 'breakthrough', 'revolution', 'disrupt', 'next', 'generation', 'advanced', 'modern', 'evolv', 'pioneer', 'vision'] },
@@ -19,21 +25,27 @@ class EnhancedTopicModeler {
     }
 
     loadCorpusStats() {
-        try {
-            const storedStats = localStorage.getItem(this.storageKey);
-            if (storedStats) {
-                const parsed = JSON.parse(storedStats);
-                return { termFrequency: new Map(parsed.termFrequency), documentFrequency: new Map(parsed.documentFrequency), totalDocuments: parsed.totalDocuments, emergingPhrases: new Map(parsed.emergingPhrases) };
-            }
-        } catch (e) { console.error("Could not load corpus stats:", e); }
+        if (this.persistToLocalStorage) {
+            try {
+                const storedStats = localStorage.getItem(this.storageKey);
+                if (storedStats) {
+                    const parsed = JSON.parse(storedStats);
+                    return { termFrequency: new Map(parsed.termFrequency), documentFrequency: new Map(parsed.documentFrequency), totalDocuments: parsed.totalDocuments, emergingPhrases: new Map(parsed.emergingPhrases) };
+                }
+            } catch (e) { console.error("Could not load corpus stats:", e); }
+        }
+        // This is now the default for a non-persistent modeler
         return { termFrequency: new Map(), documentFrequency: new Map(), totalDocuments: 0, emergingPhrases: new Map() };
     }
 
     saveCorpusStats() {
-        try {
-            const serializableStats = { termFrequency: Array.from(this.corpusStats.termFrequency.entries()), documentFrequency: Array.from(this.corpusStats.documentFrequency.entries()), totalDocuments: this.corpusStats.totalDocuments, emergingPhrases: Array.from(this.corpusStats.emergingPhrases.entries()) };
-            localStorage.setItem(this.storageKey, JSON.stringify(serializableStats));
-        } catch (e) { console.error("Could not save corpus stats:", e); }
+        // MODIFIED: Check the setting before trying to save
+        if (this.persistToLocalStorage) {
+            try {
+                const serializableStats = { termFrequency: Array.from(this.corpusStats.termFrequency.entries()), documentFrequency: Array.from(this.corpusStats.documentFrequency.entries()), totalDocuments: this.corpusStats.totalDocuments, emergingPhrases: Array.from(this.corpusStats.emergingPhrases.entries()) };
+                localStorage.setItem(this.storageKey, JSON.stringify(serializableStats));
+            } catch (e) { console.error("Could not save corpus stats:", e); }
+        }
     }
     
     preprocess(text) {
@@ -112,6 +124,106 @@ class EnhancedTopicModeler {
         return { theme: assignedTheme, scores: themeScores, confidence: this.calculateConfidence(themeScores) };
     }
     
+    // ADDED: New method to discover emerging themes
+    discoverEmergingThemes(minOccurrences = 2) {
+        const themes = [];
+        for (const [phrase, count] of this.corpusStats.emergingPhrases.entries()) {
+            if (count >= minOccurrences) {
+                // Check if the phrase is truly novel and not just part of an existing theme
+                const isNovel = !Object.values(this.themeDefinitions).some(theme =>
+                    phrase.split(' ').some(token =>
+                        (theme.exact && theme.exact.includes(token)) ||
+                        (theme.partial && theme.partial.some(kw => token.startsWith(kw)))
+                    )
+                );
+                if (isNovel) {
+                    themes.push({ phrase, count });
+                }
+            }
+        }
+        return themes.sort((a, b) => b.count - a.count).slice(0, 5);
+    }
+
+    // MODIFIED: Replaced the entire method. It now requires the full submission list.
+    generateInsights(submissions) {
+        if (!submissions || submissions.length === 0) {
+            return null;
+        }
+
+        const themeData = {};
+        Object.keys(this.themeDefinitions).forEach(theme => {
+            themeData[theme] = {
+                count: 0,
+                sentiments: { positive: 0, negative: 0, concern: 0, neutral: 0 },
+                representativeQuestions: []
+            };
+        });
+
+        // 1. Aggregate data by theme
+        submissions.forEach(sub => {
+            if (themeData[sub.theme]) {
+                themeData[sub.theme].count++;
+                themeData[sub.theme].sentiments[sub.sentiment]++;
+                // Store the text and confidence for finding the best examples later
+                themeData[sub.theme].representativeQuestions.push({ text: sub.text, confidence: sub.confidence });
+            }
+        });
+
+        // 2. Find Sentiment Hotspots
+        let mostPositiveTheme = { name: 'N/A', score: 0 };
+        let mostConcernTheme = { name: 'N/A', score: 0 };
+
+        for (const themeName in themeData) {
+            const theme = themeData[themeName];
+            if (theme.count > 0) {
+                const positiveRatio = theme.sentiments.positive / theme.count;
+                const concernRatio = theme.sentiments.concern / theme.count;
+
+                if (positiveRatio > mostPositiveTheme.score) {
+                    mostPositiveTheme = { name: themeName, score: positiveRatio };
+                }
+                if (concernRatio > mostConcernTheme.score) {
+                    mostConcernTheme = { name: themeName, score: concernRatio };
+                }
+            }
+        }
+
+        // 3. Find Key Discussion Points (Top 2 themes by volume)
+        const topThemes = Object.entries(themeData)
+            .filter(([_, data]) => data.count > 0)
+            .sort((a, b) => b[1].count - a[1].count)
+            .slice(0, 2)
+            .map(([name, data]) => {
+                // Sort questions by confidence to find the most representative one
+                data.representativeQuestions.sort((a, b) => b.confidence - a.confidence);
+                return {
+                    name,
+                    count: data.count,
+                    example: data.representativeQuestions.length > 0 ? data.representativeQuestions[0].text : "No specific example available."
+                };
+            });
+            
+        // 4. Discover Emerging Concepts (using existing logic) and find an example
+        const emerging = this.discoverEmergingThemes(2).map(theme => {
+            // Find the first submission that contains this emerging phrase
+            const exampleSubmission = submissions.find(s => s.text.toLowerCase().includes(theme.phrase));
+            return {
+                ...theme,
+                example: exampleSubmission ? exampleSubmission.text : "No specific example available."
+            };
+        });
+
+        return {
+            totalDocuments: submissions.length,
+            sentimentHotspots: {
+                positive: mostPositiveTheme.score > 0.1 ? mostPositiveTheme.name : null,
+                concern: mostConcernTheme.score > 0.1 ? mostConcernTheme.name : null,
+            },
+            keyDiscussionPoints: topThemes,
+            emergingConcepts: emerging
+        };
+    }
+
     calculateConfidence(scores) {
         const values = Object.values(scores);
         if (values.length === 0) return 0.3;

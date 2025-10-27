@@ -7,6 +7,8 @@ class VisualizationManager {
         // Jargon and Synonym Normalization Map
         // Keys MUST be lowercase. Values are the desired final display form.
         this.jargonMap = {
+            'stl': 'ST Logistics',
+            'st logistics': 'ST Logistics',
             'ai': 'AI',
             'a.i.': 'AI',
             'artificial intelligence': 'AI',
@@ -89,44 +91,53 @@ class VisualizationManager {
         return html;
     }
 
+    // MODIFIED: Replaced the entire method to add a punctuation cleaning step
     renderWordCloudForPresenter(submissions) {
         if (submissions.length === 0) return '<h2>Waiting for approved submissions...</h2>';
 
-        // First, extract and normalize all terms and phrases
+        // Step 1: Extract all raw terms and phrases from submissions
         const allTerms = submissions.flatMap(s => 
             (s.keyTerms.map(kt => kt.term)).concat(s.keyPhrases || [])
         );
 
-        const normalizedTerms = allTerms.map(term => this.normalizeTerm(term));
+        // ADDED STEP 2: Clean every term to remove punctuation for this visualization ONLY.
+        // This regex removes any character that is NOT a Unicode letter, number, whitespace, or hyphen.
+        const cleanedTerms = allTerms.map(term => 
+            term.replace(/[^\p{L}\p{N}\s-]/gu, '').trim()
+        ).filter(term => term.length > 0); // Also filter out any empty strings that might result
 
-        // --- REFINEMENT: Case-insensitive counting ---
-        // This is the most robust way to count. We use a map where keys are the
-        // lowercase version for counting, but we store the correctly-cased version.
+        // Step 3: Normalize the cleaned terms (e.g., 'ml' -> 'Machine Learning')
+        const normalizedTerms = cleanedTerms.map(term => this.normalizeTerm(term));
+
+        // Step 4: Perform case-insensitive counting on the clean, normalized terms
         const termCounts = new Map();
         normalizedTerms.forEach(term => {
             const lowerTerm = term.toLowerCase();
             const existing = termCounts.get(lowerTerm);
             if (existing) {
-                // Increment the count
                 existing.count++;
             } else {
-                // Add the new term, storing its original casing for display
                 termCounts.set(lowerTerm, { displayTerm: term, count: 1 });
             }
         });
 
-        // Boost scores for multi-word phrases
-        const multiWordPhrases = submissions.flatMap(s => s.keyPhrases || []).map(p => this.normalizeTerm(p));
+        // Step 5: Boost scores for multi-word phrases (using the cleaned & normalized phrases)
+        const multiWordPhrases = submissions.flatMap(s => s.keyPhrases || [])
+            .map(p => p.replace(/[^\p{L}\p{N}\s-]/gu, '').trim()) // Clean the phrases again here
+            .filter(p => p.length > 0)
+            .map(p => this.normalizeTerm(p));
+            
         multiWordPhrases.forEach(phrase => {
-            const lowerPhrase = phrase.toLowerCase();
-            const existing = termCounts.get(lowerPhrase);
-            if (existing) {
-                // Give a 0.5 bonus for being a multi-word phrase
-                existing.count += 0.5;
+            if (phrase.includes(' ')) { // Only boost if it's actually a multi-word phrase
+                const lowerPhrase = phrase.toLowerCase();
+                const existing = termCounts.get(lowerPhrase);
+                if (existing) {
+                    existing.count += 0.5; // Give a bonus for being a multi-word phrase
+                }
             }
         });
 
-        // Convert the map to an array and sort by count
+        // Step 6: Sort, slice, and render the final word cloud
         const sorted = Array.from(termCounts.values())
             .sort((a, b) => b.count - a.count)
             .slice(0, 30);
@@ -146,7 +157,7 @@ class VisualizationManager {
             if (normalizedCount > 0.8) colorClass = 't-cyan';
             else if (normalizedCount > 0.5) colorClass = 't-orange';
             else if (normalizedCount > 0.2) colorClass = 't-primary';
-            const formattedTerm = displayTerm.replace(/ /g, '\u00A0');
+            const formattedTerm = displayTerm.replace(/ /g, '\u00A0'); // Use non-breaking space
             html += `<span class="cloud-word ${colorClass}" style="font-size: ${fontSizeRem.toFixed(2)}rem; font-weight: ${fontWeight};">${formattedTerm}</span>`;
         });
         html += '</div>';
@@ -193,6 +204,61 @@ class VisualizationManager {
             wordEl.style.animationDelay = `${index * 0.05}s`;
             wordEl.classList.add('placed');
         });
+    }
+    renderInsightsSummaryForPresenter(insights) {
+        if (!insights || insights.totalDocuments < 3) {
+            return '<h2>Waiting for more data to generate insights...</h2>';
+        }
+
+        let html = '<div class="summary-panel executive-briefing">';
+
+        // --- Section 1: Sentiment Hotspots ---
+        if (insights.sentimentHotspots.positive || insights.sentimentHotspots.concern) {
+            html += `<div class="insight-card">
+                        <h4 class="insight-title">Sentiment Hotspots</h4>`;
+            if (insights.sentimentHotspots.positive) {
+                html += `<div class="hotspot positive">
+                            <span class="hotspot-icon">👍</span>
+                            <div><strong>Most Positive Topic:</strong> ${insights.sentimentHotspots.positive}</div>
+                         </div>`;
+            }
+            if (insights.sentimentHotspots.concern) {
+                html += `<div class="hotspot concern">
+                            <span class="hotspot-icon">🤔</span>
+                            <div><strong>Top Area of Concern:</strong> ${insights.sentimentHotspots.concern}</div>
+                         </div>`;
+            }
+            html += `</div>`;
+        }
+
+        // --- Section 2: Key Discussion Points ---
+        if (insights.keyDiscussionPoints.length > 0) {
+            html += `<div class="insight-card">
+                        <h4 class="insight-title">Key Discussion Points</h4>`;
+            insights.keyDiscussionPoints.forEach(topic => {
+                html += `<div class="discussion-point">
+                            <h5>${topic.name} (${topic.count} submissions)</h5>
+                            <blockquote class="representative-quote">“${topic.example}”</blockquote>
+                         </div>`;
+            });
+            html += `</div>`;
+        }
+
+        // --- Section 3: Emerging Concepts ---
+        if (insights.emergingConcepts.length > 0) {
+            html += `<div class="insight-card">
+                        <h4 class="insight-title">🔥 Emerging Concepts</h4>`;
+            insights.emergingConcepts.forEach(concept => {
+                html += `<div class="discussion-point">
+                            <h5>${concept.phrase} (mentioned ${concept.count} times)</h5>
+                            <blockquote class="representative-quote">“${concept.example}”</blockquote>
+                         </div>`;
+            });
+            html += `</div>`;
+        }
+
+        html += '</div>';
+        return html;
     }
 
     renderSentimentOverviewForPresenter(submissions) {

@@ -14,6 +14,18 @@
     <div class="presenter-container">
         <header class="presenter-header">
             <h2 id="current-view-title">Live Audience Insights</h2>
+            <!-- ADDED: Presenter Controls -->
+            <div id="presenter-controls">
+                <button id="pause-btn" class="presenter-control-btn" title="Pause Rotation">
+                    <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                </button>
+                <button id="play-btn" class="presenter-control-btn hidden" title="Resume Rotation">
+                    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                </button>
+                <button id="skip-btn" class="presenter-control-btn" title="Next Visualization">
+                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"></path></svg>
+                </button>
+            </div>
             <div class="progress-bar-container">
                 <div id="progress-bar" class="progress-bar"></div>
             </div>
