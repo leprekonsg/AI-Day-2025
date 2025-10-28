@@ -10,7 +10,7 @@ class Presenter {
         this.titleElement = document.getElementById('current-view-title');
         this.progressBar = document.getElementById('progress-bar');
         
-        // ADDED: Control elements
+        // Control elements
         this.pauseBtn = document.getElementById('pause-btn');
         this.playBtn = document.getElementById('play-btn');
         this.skipBtn = document.getElementById('skip-btn');
@@ -26,7 +26,11 @@ class Presenter {
         this.rotationInterval = 15000;
         this.unsubscribe = null;
 
-        // ADDED: State management for controls
+         // ADDED: Override elements
+        this.overrideContainer = document.getElementById('override-container');
+        this.overrideTheme = this.overrideContainer.querySelector('.override-theme');
+        this.overrideText = this.overrideContainer.querySelector('.override-text');
+
         this.isPaused = false;
         this.timerId = null;
     }
@@ -41,10 +45,15 @@ class Presenter {
             this.renderCurrentView();
         });
 
-        // ADDED: Event listeners for the new controls
+        // Event listeners for the new controls
         this.pauseBtn.addEventListener('click', () => this.pause());
         this.playBtn.addEventListener('click', () => this.play());
         this.skipBtn.addEventListener('click', () => this.skip());
+
+        // ADDED: Start listening for the override command
+        this.storage.listenForOverride(overrideData => {
+            this.handleOverride(overrideData);
+        });
 
         this.startTimer(); // MODIFIED: Use a dedicated method to start the timer
         this.rotateView();
@@ -119,6 +128,20 @@ class Presenter {
             this.progressBar.style.animationPlayState = 'paused';
         } else {
             this.progressBar.style.animationPlayState = 'running';
+        }
+    }
+     // ADDED: New method to handle the override state
+    handleOverride(overrideData) {
+        if (overrideData) {
+            // An override is active
+            this.overrideTheme.textContent = overrideData.theme;
+            this.overrideText.textContent = `“${overrideData.text}”`;
+            this.overrideContainer.classList.remove('hidden');
+            this.pause(); // Reuse our existing pause logic
+        } else {
+            // The override has been cleared
+            this.overrideContainer.classList.add('hidden');
+            this.play(); // Reuse our existing play logic
         }
     }
 }

@@ -343,3 +343,142 @@ body.presenter-mode {
 .legend-item.negative span { background-color: var(--color-accent-red); }
 .legend-item.neutral span { background-color: var(--color-text-secondary); }
 .legend-item.concern span { background-color: var(--color-accent-orange); }
+
+.featured-star {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+/* ADDED: Styles for the new List View */
+.list-view-container {
+    width: 100%;
+    max-width: 800px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: var(--space-sm); /* Space for scrollbar */
+}
+
+/* Custom scrollbar for the list view */
+.list-view-container::-webkit-scrollbar {
+    width: 8px;
+}
+.list-view-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+.list-view-container::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+}
+
+.list-item {
+    background: rgba(20, 24, 34, 0.4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.list-item.featured-item {
+    border-color: var(--color-accent-orange);
+    background: rgba(255, 140, 66, 0.05);
+    box-shadow: 0 0 15px rgba(255, 140, 66, 0.1);
+}
+
+.list-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+    font-size: 0.9rem;
+}
+
+.list-item-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--color-accent-cyan);
+    font-weight: 600;
+}
+
+.featured-icon {
+    font-size: 1.2rem;
+}
+
+.list-item-sentiment {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sentiment-label {
+    text-transform: capitalize;
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.list-item-body {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.list-item-body .highlight {
+    color: var(--color-accent-cyan);
+    font-weight: 600;
+}
+
+.list-item-footer {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    text-align: right;
+}
+
+/* ADDED: Styles for the Director Mode Override Overlay */
+#override-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(11, 15, 26, 0.95); /* Almost opaque background */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+#override-container:not(.hidden) {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.override-content {
+    text-align: center;
+    max-width: 1000px;
+    padding: 2rem;
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.override-theme {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--color-accent-cyan);
+    margin-bottom: 1rem;
+}
+
+.override-text {
+    font-size: 2.8rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+}

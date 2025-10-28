@@ -55,14 +55,15 @@ class Storage {
      * @returns {function} An unsubscribe function to stop listening for changes.
      */
     getApprovedSubmissions(callback) {
-        const unsubscribe = this.submissionsRef.where('status', '==', 'approved')
+        // MODIFIED: Use an 'in' query to get both approved and featured documents
+        const unsubscribe = this.submissionsRef.where('status', 'in', ['approved', 'featured'])
             .orderBy('timestamp', 'desc')
             .onSnapshot(querySnapshot => {
                 const approved = [];
                 querySnapshot.forEach(doc => {
                     approved.push({ firestoreId: doc.id, ...doc.data() });
                 });
-                console.log(`[Firestore] Presenter received update. Found ${approved.length} approved submissions.`);
+                console.log(`[Firestore] Presenter received update. Found ${approved.length} live submissions.`);
                 callback(approved);
             }, error => {
                 console.error("[Firestore] Error listening to approved submissions: ", error);
@@ -77,5 +78,37 @@ class Storage {
         } catch (error) {
             console.error(`[Firestore] FAILED to update submission with ID ${firestoreId}.`, error);
         }
+    }
+
+     // ADDED: Method to set or create the override document
+    async setOverride(questionData) {
+        try {
+            // We use a predictable document ID 'current' for easy access
+            await db.collection('live_control').doc('current').set(questionData);
+            console.log("[Firestore] Override set with question ID:", questionData.firestoreId);
+        } catch (error) {
+            console.error("[Firestore] FAILED to set override.", error);
+        }
+    }
+
+    // ADDED: Method to clear the override document
+    async clearOverride() {
+        try {
+            await db.collection('live_control').doc('current').delete();
+            console.log("[Firestore] Override cleared.");
+        } catch (error) {
+            console.error("[Firestore] FAILED to clear override.", error);
+        }
+    }
+
+    // ADDED: Method for the Presenter and Moderator to listen to the override state
+    listenForOverride(callback) {
+        const unsubscribe = db.collection('live_control').doc('current')
+            .onSnapshot(doc => {
+                callback(doc.exists ? { id: doc.id, ...doc.data() } : null);
+            }, error => {
+                console.error("[Firestore] Error listening to override: ", error);
+            });
+        return unsubscribe;
     }
 }

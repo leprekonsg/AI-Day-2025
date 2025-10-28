@@ -12,14 +12,34 @@
 <body class="moderator-mode">
     <canvas id="background-canvas"></canvas> 
     <div class="moderator-container">
-        <h1>Moderation Queue</h1>
-        <p>Approve or reject new submissions to display them on the main screen.</p>
-        <div class="queue-stats">
-            Pending Review: <span id="pending-count">0</span>
+        <h1>Moderator Control Center</h1>
+        <p>Triage new submissions, manage the live pool, and feature key questions for the presenter.</p>
+
+        <!-- ADDED: The Featured Rail -->
+        <div class="moderator-section featured-section">
+            <h2>⭐ Featured Questions (<span id="featured-count">0</span>)</h2>
+            <div id="featured-rail" class="submission-list">
+                <!-- Featured cards will be injected here -->
+            </div>
         </div>
-        <div id="pending-queue" class="pending-queue">
-            <!-- Pending submission cards will be injected here -->
-        </div>
+
+        <!-- ADDED: Two-column layout -->
+        <div class="moderator-columns">
+            <!-- Column 1: Pending Queue -->
+            <div class="moderator-section">
+                <h2>📥 Triage Queue (<span id="pending-count">0</span>)</h2>
+                <div id="pending-queue" class="submission-list">
+                    <!-- Pending cards will be injected here -->
+                </div>
+            </div>
+
+            <!-- Column 2: Approved Pool -->
+            <div class="moderator-section">
+                <h2>✅ Live Pool (<span id="approved-count">0</span>)</h2>
+                <div id="approved-pool" class="submission-list">
+                    <!-- Approved cards will be injected here -->
+                </div>
+            </div>
     </div>
     
     <!-- Shared Scripts -->

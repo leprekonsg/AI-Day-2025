@@ -12,6 +12,13 @@
 <body class="presenter-mode">
     <canvas id="background-canvas"></canvas> 
     <div class="presenter-container">
+        <!-- ADDED: The full-screen override overlay, initially hidden -->
+        <div id="override-container" class="hidden">
+            <div class="override-content">
+                <h3 class="override-theme"></h3>
+                <p class="override-text"></p>
+            </div>
+        </div>
         <header class="presenter-header">
             <h2 id="current-view-title">Live Audience Insights</h2>
             <!-- ADDED: Presenter Controls -->

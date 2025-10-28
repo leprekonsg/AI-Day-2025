@@ -261,6 +261,88 @@ class VisualizationManager {
         return html;
     }
 
+     // ADDED: New method to render a detailed list of submissions
+    renderListView(submissions) {
+        if (!submissions || submissions.length === 0) {
+            return '<h2>Waiting for approved submissions...</h2>';
+        }
+
+        // Sort by timestamp, newest first
+        const sorted = [...submissions].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        let html = '<div class="list-view-container">';
+        
+        sorted.forEach(sub => {
+            const icon = this.themeIcons[sub.theme] || '💭';
+            
+            // Determine sentiment icon and color
+            let sentimentIcon = '·';
+            let sentimentColor = 'var(--color-text-secondary)';
+            if (sub.sentiment === 'positive') {
+                sentimentIcon = '✓';
+                sentimentColor = 'var(--color-success)';
+            } else if (sub.sentiment === 'concern' || sub.sentiment === 'negative') {
+                sentimentIcon = '!';
+                sentimentColor = 'var(--color-accent-orange)';
+            }
+
+            // Calculate time ago
+            const seconds = Math.floor((new Date() - new Date(sub.timestamp)) / 1000);
+            let timeAgo = 'Just now';
+            if (seconds >= 60 && seconds < 3600) {
+                timeAgo = `${Math.floor(seconds / 60)}m ago`;
+            } else if (seconds >= 3600 && seconds < 86400) {
+                timeAgo = `${Math.floor(seconds / 3600)}h ago`;
+            } else if (seconds >= 86400) {
+                 timeAgo = `${Math.floor(seconds / 86400)}d ago`;
+            }
+
+            // Highlight key terms in the text
+            let text = sub.text;
+            if (sub.keyTerms && sub.keyTerms.length > 0) {
+                // Create a regex that matches any of the key terms, case-insensitive
+                // We use \b to ensure we only match whole words
+                const termsPattern = sub.keyTerms.map(kt => kt.term).join('|');
+                try {
+                    const regex = new RegExp(`\\b(${termsPattern})\\b`, 'gi');
+                    text = text.replace(regex, '<strong class="highlight">$1</strong>');
+                } catch (e) {
+                    // Fallback if regex fails (e.g., special characters in terms)
+                    console.warn("Could not highlight terms:", e);
+                }
+            }
+
+            // Check if featured
+            const isFeatured = sub.status === 'featured';
+            const featuredClass = isFeatured ? 'featured-item' : '';
+            const featuredIcon = isFeatured ? '<span class="featured-icon">⭐</span>' : '';
+
+            html += `
+                <div class="list-item ${featuredClass}">
+                    <div class="list-item-header">
+                        <div class="list-item-meta">
+                            ${featuredIcon}
+                            <span class="theme-icon">${icon}</span>
+                            <span class="theme-name">${sub.theme}</span>
+                        </div>
+                        <div class="list-item-sentiment" style="color: ${sentimentColor}">
+                            ${sentimentIcon} <span class="sentiment-label">${sub.sentiment}</span>
+                        </div>
+                    </div>
+                    <div class="list-item-body">
+                        "${text}"
+                    </div>
+                    <div class="list-item-footer">
+                        ${timeAgo}
+                    </div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        return html;
+    }
+
     renderSentimentOverviewForPresenter(submissions) {
         // ... (this method remains unchanged) ...
         if (submissions.length === 0) return '<h2>Waiting for approved submissions...</h2>';

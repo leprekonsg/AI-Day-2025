@@ -98,3 +98,66 @@
 .reject-btn:hover {
     background-color: #c82333;
 }
+
+/* ADDED: New styles for the Control Center layout */
+.moderator-section {
+    margin-bottom: 2rem;
+}
+
+.moderator-section h2 {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 1rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.moderator-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.submission-list {
+    display: grid;
+    gap: 1rem;
+    min-height: 100px; /* Prevents layout collapse when empty */
+}
+
+.empty-message {
+    color: var(--color-text-secondary);
+    padding: 1rem;
+    text-align: center;
+}
+
+.submission-card {
+    /* ... (existing styles) ... */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensures actions are at the bottom */
+}
+
+.card-text {
+    margin: 0 0 1rem 0;
+}
+
+.featured-card {
+    border-color: var(--color-accent-orange);
+    background: rgba(255, 140, 66, 0.1);
+}
+
+/* ADDED: Styles for Director Mode buttons */
+.btn.display-now-btn {
+    background-color: var(--color-success);
+    color: #fff;
+}
+.btn.clear-override-btn {
+    background-color: var(--color-accent-red);
+    color: #fff;
+}
+
+/* ADDED: Styles for new button variants */
+.btn.feature-now-btn { background-color: var(--color-accent-orange); color: #fff; }
+.btn.feature-btn { background-color: var(--color-accent-orange); color: #fff; }
+.btn.recall-btn { background-color: var(--color-text-secondary); color: #fff; }
+.btn.unfeature-btn { background-color: var(--color-text-secondary); color: #fff; }
