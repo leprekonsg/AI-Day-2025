@@ -9,3 +9,5 @@ npm-debug.log
 # Generated Files
 # Ignore the generated firebase config file
 shared/firebase-init.js
+serviceAccountKey.json
+questions_upload.xlsx

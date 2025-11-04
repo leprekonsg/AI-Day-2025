@@ -12,12 +12,24 @@
 <body class="presenter-mode">
     <canvas id="background-canvas"></canvas> 
     <div class="presenter-container">
-        <!-- ADDED: The full-screen override overlay, initially hidden -->
-        <div id="override-container" class="hidden">
+        <!-- The full-screen override overlay, initially NOT hidden -->
+        <!-- MODIFICATION: Removed the 'hidden' class from this line -->
+        <div id="override-container">
             <div class="override-content">
                 <h3 class="override-theme"></h3>
                 <p class="override-text"></p>
             </div>
+
+            <!-- ADDED: The footer, which will be visible only when the overlay is active -->
+            <footer class="override-footer">
+                <div class="qr-code">
+                    <img src="img/qr_code.png" alt="QR Code to submit questions">
+                </div>
+                <div class="cta-text">
+                    <h3>Join the Conversation</h3>
+                    <p>Scan the code or go to <strong>https://stl-ai-conference-2025-f9b6h0efbkfhdfcx.southeastasia-01.azurewebsites.net/</strong></p>
+                </div>
+            </footer>
         </div>
         <header class="presenter-header">
             <h2 id="current-view-title">Live Audience Insights</h2>

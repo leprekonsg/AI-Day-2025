@@ -1,5 +1,3 @@
-// In: shared/storage.js
-
 /* ============================================= */
 /* STORAGE MANAGER (FIRESTORE IMPLEMENTATION)    */
 /* ============================================= */
@@ -108,6 +106,21 @@ class Storage {
                 callback(doc.exists ? { id: doc.id, ...doc.data() } : null);
             }, error => {
                 console.error("[Firestore] Error listening to override: ", error);
+            });
+        return unsubscribe;
+    }
+
+    // ADDED: Method for the Presenter to listen for poll responses
+    listenForPollResponses(callback) {
+        const unsubscribe = db.collection('poll_responses')
+            .onSnapshot(querySnapshot => {
+                const responses = [];
+                querySnapshot.forEach(doc => {
+                    responses.push(doc.data());
+                });
+                callback(responses);
+            }, error => {
+                console.error("[Firestore] Error listening to poll responses: ", error);
             });
         return unsubscribe;
     }

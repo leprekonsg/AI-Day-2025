@@ -1,3 +1,4 @@
+// MODIFIED: Replaced the entire class to fix the rendering conflict
 class Moderator {
     constructor() {
         this.storage = new Storage();
@@ -11,55 +12,41 @@ class Moderator {
         this.featuredCount = document.getElementById('featured-count');
 
         this.unsubscribers = [];
-        this.currentOverrideId = null; // ADDED: To track the live question
+        this.currentOverrideId = null;
         this.init();
     }
 
     init() {
-        // ADDED: Listen to the override state to update the UI
+        // Listener for the override state.
+        // MODIFIED: This now ONLY updates the state and triggers a re-render of the featured column.
         const overrideUnsubscribe = this.storage.listenForOverride(overrideData => {
-            this.currentOverrideId = overrideData ? overrideData.firestoreId : null;
-            // We need to re-render the featured rail to show the correct button
-            this.refreshCollection('featured');
+            const newOverrideId = overrideData ? overrideData.firestoreId : null;
+            // Only re-render if the override ID has actually changed
+            if (this.currentOverrideId !== newOverrideId) {
+                this.currentOverrideId = newOverrideId;
+                // Manually trigger the listener for the featured collection to re-render with the new state.
+                // We do this by re-attaching it.
+                if (this.featuredListener) this.featuredListener(); // Unsubscribe the old one
+                this.featuredListener = this.listenToCollection('featured', this.featuredRail, this.featuredCount, this.createFeaturedCard.bind(this));
+            }
         });
         this.unsubscribers.push(overrideUnsubscribe);
 
         // Set up the three collection listeners
         this.listenToCollection('pending', this.pendingQueue, this.pendingCount, this.createPendingCard.bind(this));
         this.listenToCollection('approved', this.approvedPool, this.approvedCount, this.createApprovedCard.bind(this));
-        this.listenToCollection('featured', this.featuredRail, this.featuredCount, this.createFeaturedCard.bind(this));
+        // Store the featured listener so we can refresh it
+        this.featuredListener = this.listenToCollection('featured', this.featuredRail, this.featuredCount, this.createFeaturedCard.bind(this));
     }
 
-    // ADDED: A helper to manually refresh a single column when state changes
-    refreshCollection(status) {
-        const collectionMap = {
-            'featured': { container: this.featuredRail, countEl: this.featuredCount, creator: this.createFeaturedCard.bind(this) }
-            // Add other collections here if they ever need manual refreshing
-        };
-        const config = collectionMap[status];
-        if (!config) return;
-
-        this.storage.submissionsRef.where('status', '==', status).orderBy('timestamp', 'desc').get().then(querySnapshot => {
-            config.countEl.textContent = querySnapshot.size;
-            config.container.innerHTML = '';
-            if (querySnapshot.empty) {
-                config.container.innerHTML = `<p class="empty-message">This list is empty.</p>`;
-            } else {
-                querySnapshot.forEach(doc => {
-                    const sub = { firestoreId: doc.id, ...doc.data() };
-                    const card = config.creator(sub);
-                    config.container.appendChild(card);
-                });
-            }
-        });
-    }
+    // REMOVED: The conflicting refreshCollection method has been deleted.
 
     listenToCollection(status, container, countEl, cardCreator) {
         const unsubscribe = this.storage.submissionsRef.where('status', '==', status)
             .orderBy('timestamp', 'desc')
             .onSnapshot(querySnapshot => {
                 countEl.textContent = querySnapshot.size;
-                container.innerHTML = ''; // Clear the container on each update
+                container.innerHTML = '';
                 if (querySnapshot.empty) {
                     container.innerHTML = `<p class="empty-message">This list is empty.</p>`;
                 } else {
@@ -72,9 +59,9 @@ class Moderator {
             }, error => console.error(`[Firestore] Error listening to ${status} submissions:`, error));
         
         this.unsubscribers.push(unsubscribe);
+        return unsubscribe; // Return the function to allow us to re-attach it
     }
 
-    // Card Creator for the PENDING column
     createPendingCard(sub) {
         const card = this.createBaseCard(sub);
         card.innerHTML += `
@@ -89,7 +76,6 @@ class Moderator {
         return card;
     }
 
-    // Card Creator for the APPROVED column
     createApprovedCard(sub) {
         const card = this.createBaseCard(sub);
         card.innerHTML += `
@@ -102,13 +88,12 @@ class Moderator {
         return card;
     }
 
-     // MODIFIED: The Featured card creator now has conditional logic for the button
     createFeaturedCard(sub) {
         const card = this.createBaseCard(sub);
         card.classList.add('featured-card');
 
         let actionButtonHTML = '';
-        // Check if THIS card is the one currently being displayed
+        // MODIFIED: The card creator now correctly checks the current override state
         if (this.currentOverrideId === sub.firestoreId) {
             actionButtonHTML = `<button class="btn clear-override-btn" title="Hide from main screen">Hide from Screen</button>`;
         } else {
@@ -123,7 +108,6 @@ class Moderator {
 
         card.querySelector('.unfeature-btn').addEventListener('click', () => this.updateStatus(sub.firestoreId, 'approved'));
         
-        // Add listeners for the new buttons
         const displayBtn = card.querySelector('.display-now-btn');
         if (displayBtn) {
             displayBtn.addEventListener('click', () => this.storage.setOverride(sub));
@@ -153,7 +137,6 @@ class Moderator {
 
     updateStatus(id, status) {
         this.storage.updateSubmissionStatus(id, status);
-        // No need to manually remove cards; the real-time listeners will handle it automatically.
     }
 }
 

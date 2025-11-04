@@ -1,35 +1,42 @@
-/* Presenter Mode Dashboard Styles */
+/* Presenter Mode Dashboard Styles - Premium Swiss Spa Aesthetic */
 body.presenter-mode {
-    background: #0D1117;
-    color: #fff;
-    font-family: 'Segoe UI', sans-serif;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-sans);
     overflow: hidden;
+    font-weight: 300;
+    letter-spacing: 0.01em;
 }
 .presenter-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: 2rem 3rem;
+    padding: clamp(1.5rem, 3vw, 3rem) clamp(2rem, 4vw, 4rem);
+    max-width: 1920px;
+    margin: 0 auto;
 }
 .presenter-header {
     flex-shrink: 0;
-    padding-bottom: 1rem;
+    padding-bottom: clamp(0.75rem, 1.5vw, 1.25rem);
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
     border-bottom: 1px solid var(--color-border);
 }
 #current-view-title {
-    font-size: 1.8rem;
-    font-weight: 600;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
     text-align: center;
-    margin: 0 0 1rem 0;
+    margin: 0 0 clamp(0.75rem, 1.5vw, 1rem) 0;
+    color: var(--color-text-primary);
 }
 
-/* ADDED: Styles for the new Presenter Controls */
+/* Presenter Controls - Minimalist Design */
 #presenter-controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-sm);
+    gap: clamp(0.5rem, 1vw, 0.75rem);
+    margin-bottom: clamp(0.75rem, 1.5vw, 1rem);
 }
 
 .presenter-control-btn {
@@ -37,25 +44,30 @@ body.presenter-mode {
     border: 1px solid var(--color-border);
     color: var(--color-text-secondary);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: clamp(36px, 3vw, 44px);
+    height: clamp(36px, 3vw, 44px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
+    padding: 0;
 }
 
 .presenter-control-btn:hover {
-    background-color: var(--color-background-secondary);
+    background-color: rgba(0, 212, 255, 0.05);
     color: var(--color-accent-cyan);
     border-color: var(--color-accent-cyan);
-    transform: scale(1.1);
+    transform: translateY(-1px);
+}
+
+.presenter-control-btn:active {
+    transform: translateY(0);
 }
 
 .presenter-control-btn svg {
-    width: 20px;
-    height: 20px;
+    width: clamp(18px, 1.5vw, 22px);
+    height: clamp(18px, 1.5vw, 22px);
     fill: currentColor;
 }
 
@@ -64,210 +76,415 @@ body.presenter-mode {
 }
 
 .progress-bar-container {
-    background: var(--color-border);
-    border-radius: 4px;
-    height: 8px;
+    background: rgba(0, 212, 255, 0.08);
+    border-radius: 2px;
+    height: 3px;
+    overflow: hidden;
 }
 .progress-bar {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-orange));
-    border-radius: 4px;
+    border-radius: 2px;
+    transition: width 0.3s ease;
 }
 .visualization-container {
     flex-grow: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem 0;
-    animation: fadeInUp 0.8s ease;
+    padding: clamp(1rem, 2vw, 2rem) 0;
+    animation: fadeInUp 0.6s ease;
+    overflow: hidden;
 }
 .presenter-footer {
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
-    padding-top: 1rem;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    padding-top: clamp(1rem, 2vw, 1.5rem);
+    margin-top: clamp(1rem, 2vw, 1.5rem);
     border-top: 1px solid var(--color-border);
 }
+.qr-code {
+    flex-shrink: 0;
+}
 .qr-code img {
-    width: 100px;
-    height: 100px;
-    border-radius: 8px;
+    width: clamp(80px, 8vw, 100px);
+    height: clamp(80px, 8vw, 100px);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
 }
 .cta-text h3 {
-    margin: 0;
-    font-size: 1.5rem;
+    margin: 0 0 0.375rem 0;
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
 }
 .cta-text p {
     margin: 0;
-    font-size: 1rem;
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
     color: var(--color-text-secondary);
+    font-weight: 300;
 }
 .progress-bar.active {
-    animation: fill-progress 15s linear forwards;
+    animation: fill-progress 10s linear forwards;
 }
 @keyframes fill-progress {
     from { width: 0%; }
     to { width: 100%; }
 }
 
-/* MODIFIED: Replace all old .summary-panel, .summary-section, etc. styles with these */
-.summary-panel.executive-briefing {
+/* Premium Insights Highlights */
+.insights-highlights-container {
     width: 100%;
-    max-width: 900px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-    background: none;
-    border: none;
-    padding: 0;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(180px, 20vw, 240px), 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+    padding: clamp(0.5rem, 1vw, 1rem);
 }
 
-.insight-card {
-    background: rgba(20, 24, 34, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+.highlight-card {
+    background: rgba(20, 24, 34, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-lg);
-    padding: var(--space-md);
-    animation: fadeInUp 0.6s ease forwards;
+    padding: clamp(1.25rem, 2.5vw, 1.75rem) clamp(1rem, 2vw, 1.5rem);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(0.5rem, 1vw, 0.75rem);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-base);
+    animation: fadeInUp 0.5s ease forwards;
 }
 
-.insight-title {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: var(--color-text-primary);
-    margin: 0 0 var(--space-sm) 0;
-    padding-bottom: var(--space-sm);
-    border-bottom: 1px solid var(--color-border);
+.highlight-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-orange));
+    opacity: 0;
+    transition: opacity var(--transition-base);
 }
 
-.hotspot {
+.highlight-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-border-hover);
+    background: rgba(20, 24, 34, 0.6);
+}
+
+.highlight-card:hover::before {
+    opacity: 1;
+}
+
+.highlight-card.excitement {
+    border-color: rgba(45, 211, 111, 0.2);
+}
+
+.highlight-card.concern {
+    border-color: rgba(255, 140, 66, 0.2);
+}
+
+.highlight-card.trending {
+    border-color: rgba(0, 212, 255, 0.2);
+}
+
+.highlight-card.emerging {
+    border-color: rgba(255, 140, 66, 0.2);
+}
+
+.highlight-icon {
+    width: clamp(2.5rem, 5vw, 3rem);
+    height: clamp(2.5rem, 5vw, 3rem);
+    line-height: 1;
+    animation: scaleIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    font-size: 1rem;
-    padding: var(--space-xs);
+    justify-content: center;
 }
 
-.hotspot-icon {
-    font-size: 1.5rem;
+.highlight-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
 }
 
-.hotspot.positive {
-    color: var(--color-accent-green);
+.highlight-label {
+    font-size: clamp(0.6875rem, 1.2vw, 0.75rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-secondary);
 }
 
-.hotspot.concern {
-    color: var(--color-accent-orange);
+.highlight-topic {
+    font-size: clamp(0.9375rem, 1.8vw, 1.125rem);
+    font-weight: 400;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+    min-height: auto;
 }
 
-.discussion-point {
-    margin-bottom: var(--space-sm);
-}
-.discussion-point:last-child {
-    margin-bottom: 0;
-}
-
-.discussion-point h5 {
-    font-size: 1rem;
-    font-weight: 500;
+.highlight-count {
+    font-size: clamp(0.8125rem, 1.5vw, 0.9375rem);
     color: var(--color-accent-cyan);
-    margin: 0 0 var(--space-xs) 0;
+    font-weight: 500;
 }
 
-.representative-quote {
-    margin: 0;
-    padding-left: var(--space-sm);
-    border-left: 3px solid var(--color-border-hover);
+.highlight-quote-card {
+    grid-column: 1 / -1;
+    background: rgba(0, 212, 255, 0.05);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: var(--border-radius-lg);
+    padding: clamp(1rem, 2vw, 1.5rem) clamp(1.25rem, 2.5vw, 2rem);
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    animation: fadeInUp 0.7s ease forwards;
+}
+
+.quote-icon {
+    width: clamp(1.5rem, 3vw, 2rem);
+    height: clamp(1.5rem, 3vw, 2rem);
+    color: var(--color-accent-cyan);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quote-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.5;
+}
+
+.quote-text {
+    font-size: clamp(0.875rem, 1.6vw, 1rem);
     font-style: italic;
-    color: var(--color-text-secondary);
-    font-size: 0.9rem;
-}
-.summary-footer {
-    margin-top: var(--space-md);
-    text-align: center;
-    font-size: var(--font-small);
-    color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    font-weight: 300;
 }
 
-/* --- Styles for Bar Chart View --- */
+/* Premium Bar Chart Visualization */
 .bar-chart-container {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1100px;
 }
 .bar-item {
-    margin-bottom: 1.25rem;
-    animation: fadeInUp 0.5s ease forwards;
+    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+    animation: fadeInUp 0.4s ease forwards;
 }
 .bar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-bottom: var(--space-xs);
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    font-weight: 400;
+    margin-bottom: clamp(0.5rem, 1vw, 0.625rem);
 }
 .bar-title {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: clamp(0.625rem, 1.2vw, 0.875rem);
 }
+
+.bar-title > span:first-child {
+    width: clamp(1.25rem, 2.5vw, 1.5rem);
+    height: clamp(1.25rem, 2.5vw, 1.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+}
+
 .bar-count {
     color: var(--color-text-secondary);
-    font-size: 1rem;
+    font-size: clamp(0.875rem, 1.6vw, 1rem);
+    font-weight: 300;
 }
 .bar-fill-container {
-    height: 32px;
-    background: var(--color-background-secondary);
+    height: clamp(28px, 3vw, 36px);
+    background: rgba(0, 212, 255, 0.08);
     border-radius: var(--border-radius-sm);
     overflow: hidden;
 }
 .bar-fill {
     height: 100%;
-    background: var(--color-accent-cyan);
+    background: linear-gradient(90deg, var(--color-accent-cyan), rgba(0, 212, 255, 0.8));
     border-radius: var(--border-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    color: var(--color-background-primary);
-    transition: width 0.8s ease;
+    font-weight: 500;
+    color: var(--color-bg-primary);
+    transition: width 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+    font-size: clamp(0.875rem, 1.6vw, 1rem);
 }
 
 .confidence-badge {
-    font-size: var(--font-small);
+    font-size: clamp(0.6875rem, 1.2vw, 0.75rem);
     color: var(--color-text-secondary);
-    background: rgba(56, 189, 248, 0.1);
-    padding: 2px 8px;
+    background: rgba(0, 212, 255, 0.08);
+    padding: 0.25rem 0.625rem;
     border-radius: 12px;
-    margin-left: var(--space-sm);
+    margin-left: clamp(0.5rem, 1vw, 0.75rem);
+    font-weight: 400;
 }
 
 .bar-sentiment {
     display: flex;
-    gap: var(--space-xs);
+    gap: clamp(0.375rem, 0.8vw, 0.5rem);
+    flex-wrap: wrap;
 }
 .sentiment-badge {
-    font-size: 0.8rem;
-    padding: 3px 10px;
-    border-radius: 16px;
-    font-weight: 500;
+    font-size: clamp(0.6875rem, 1.3vw, 0.8125rem);
+    padding: 0.25rem 0.625rem;
+    border-radius: 12px;
+    font-weight: 400;
+    border: 1px solid transparent;
+    transition: all var(--transition-base);
 }
-.sentiment-badge.positive { background: rgba(45, 211, 111, 0.15); color: var(--color-accent-green); }
-.sentiment-badge.negative { background: rgba(235, 68, 90, 0.15); color: var(--color-accent-red); }
-.sentiment-badge.neutral { background: rgba(139, 148, 158, 0.15); color: var(--color-text-secondary); }
-.sentiment-badge.concern { background: rgba(245, 158, 11, 0.15); color: var(--color-accent-orange); }
+.sentiment-badge.positive {
+    background: rgba(45, 211, 111, 0.1);
+    color: var(--color-accent-green);
+    border-color: rgba(45, 211, 111, 0.2);
+}
+.sentiment-badge.negative {
+    background: rgba(235, 68, 90, 0.1);
+    color: var(--color-accent-red);
+    border-color: rgba(235, 68, 90, 0.2);
+}
+.sentiment-badge.neutral {
+    background: rgba(139, 148, 171, 0.1);
+    color: var(--color-text-secondary);
+    border-color: rgba(139, 148, 171, 0.2);
+}
+.sentiment-badge.concern {
+    background: rgba(255, 140, 66, 0.1);
+    color: var(--color-accent-orange);
+    border-color: rgba(255, 140, 66, 0.2);
+}
 
 .bar-sample {
-    font-size: 0.9rem;
+    font-size: clamp(0.8125rem, 1.5vw, 0.9375rem);
     color: var(--color-text-secondary);
     font-style: italic;
-    margin-top: var(--space-xs);
-    padding-left: var(--space-sm);
-    border-left: 2px solid var(--color-border);
+    margin-top: clamp(0.5rem, 1vw, 0.625rem);
+    padding-left: clamp(0.75rem, 1.5vw, 1rem);
+    border-left: 1px solid var(--color-border);
+    font-weight: 300;
+    line-height: 1.5;
+}
+
+/* Premium Rising Terms Visualization */
+.rising-terms-container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+}
+
+.rising-terms-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 40vw, 400px), 1fr));
+    gap: clamp(0.75rem, 1.5vw, 1rem);
+}
+
+.rising-term-item {
+    display: grid;
+    grid-template-columns: clamp(45px, 5vw, 55px) 1fr clamp(60px, 7vw, 75px);
+    align-items: center;
+    gap: clamp(0.75rem, 1.5vw, 1rem);
+    background: rgba(20, 24, 34, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: clamp(0.875rem, 1.8vw, 1.125rem) clamp(1rem, 2vw, 1.25rem);
+    transition: all var(--transition-base);
+    opacity: 0;
+    animation: slideInRight 0.4s ease forwards;
+}
+
+.rising-term-item:hover {
+    transform: translateX(3px);
+    border-color: var(--color-border-hover);
+    background: rgba(20, 24, 34, 0.6);
+}
+
+.term-rank {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    font-weight: 300;
+    color: var(--color-text-secondary);
+    text-align: center;
+}
+
+.rising-term-item:nth-child(1) .term-rank,
+.rising-term-item:nth-child(2) .term-rank,
+.rising-term-item:nth-child(3) .term-rank {
+    font-size: clamp(1.5rem, 3vw, 1.875rem);
+    font-weight: 400;
+}
+
+.term-content {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.375rem, 0.8vw, 0.5rem);
+}
+
+.term-name {
+    font-size: clamp(0.9375rem, 1.8vw, 1.0625rem);
+    font-weight: 400;
+    color: var(--color-text-primary);
+    line-height: 1.3;
+}
+
+.term-bar-container {
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 212, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.term-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-orange));
+    border-radius: 2px;
+    transition: width 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.term-count {
+    font-size: clamp(1.125rem, 2.2vw, 1.375rem);
+    font-weight: 500;
+    color: var(--color-accent-cyan);
+    text-align: right;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 /* --- Styles for Word Cloud View --- */
@@ -297,52 +514,151 @@ body.presenter-mode {
 .cloud-word.t-secondary { color: var(--color-text-secondary); }
 
 
-/* --- Styles for Sentiment Overview --- */
-.sentiment-overview {
+/* Premium Sentiment Gauge Visualization */
+.sentiment-gauge-container {
     width: 100%;
-    max-width: 800px;
-}
-.sentiment-bar {
+    max-width: 1000px;
     display: flex;
-    height: 40px;
-    border-radius: var(--border-radius-md);
-    overflow: hidden;
-    margin-bottom: var(--space-lg);
-}
-.sentiment-fill {
-    height: 100%;
-    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: 600;
-    transition: width 0.8s ease;
+    gap: clamp(2rem, 4vw, 3rem);
 }
-.sentiment-fill.positive { background-color: var(--color-accent-green); }
-.sentiment-fill.negative { background-color: var(--color-accent-red); }
-.sentiment-fill.neutral { background-color: var(--color-text-secondary); }
-.sentiment-fill.concern { background-color: var(--color-accent-orange); }
 
-.sentiment-legend {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-xl);
+.gauge-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    margin: 0;
+    text-align: center;
 }
-.legend-item {
+
+.gauge-wrapper {
+    position: relative;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--space-xs);
-    font-size: 1.1rem;
 }
-.legend-item span {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
+
+.sentiment-gauge {
+    display: block;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
 }
-.legend-item.positive span { background-color: var(--color-accent-green); }
-.legend-item.negative span { background-color: var(--color-accent-red); }
-.legend-item.neutral span { background-color: var(--color-text-secondary); }
-.legend-item.concern span { background-color: var(--color-accent-orange); }
+
+.gauge-needle {
+    transition: transform 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transform-origin: 100px 100px;
+}
+
+.gauge-center {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.gauge-emoji {
+    font-size: 3rem;
+    animation: scaleIn 0.8s ease;
+}
+
+.gauge-label {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.gauge-score {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.sentiment-breakdown {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.breakdown-item {
+    background: rgba(20, 24, 34, 0.6);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.breakdown-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.breakdown-item.positive {
+    border-color: var(--color-accent-green);
+}
+
+.breakdown-item.neutral {
+    border-color: var(--color-text-secondary);
+}
+
+.breakdown-item.concern {
+    border-color: var(--color-accent-orange);
+}
+
+.breakdown-item.negative {
+    border-color: var(--color-accent-red);
+}
+
+.breakdown-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.breakdown-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.breakdown-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.breakdown-item.positive .breakdown-value {
+    color: var(--color-accent-green);
+}
+
+.breakdown-item.neutral .breakdown-value {
+    color: var(--color-text-secondary);
+}
+
+.breakdown-item.concern .breakdown-value {
+    color: var(--color-accent-orange);
+}
+
+.breakdown-item.negative .breakdown-value {
+    color: var(--color-accent-red);
+}
+
+.breakdown-count {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
 
 .featured-star {
     font-size: 1.2rem;
@@ -438,35 +754,78 @@ body.presenter-mode {
     text-align: right;
 }
 
-/* ADDED: Styles for the Director Mode Override Overlay */
+/* MODIFIED: Adjust the main override container */
 #override-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(11, 15, 26, 0.95); /* Almost opaque background */
+    background-color: rgba(11, 15, 26, 0.95);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     z-index: 1000;
     display: flex;
+    flex-direction: column; /* ADDED: Arrange content vertically */
     align-items: center;
-    justify-content: center;
+    justify-content: center; /* ADDED: Center the main question text */
     opacity: 0;
     transition: opacity 0.5s ease;
     pointer-events: none;
+    padding: 2rem; /* ADDED: Add padding for safety on all screen sizes */
 }
 
-#override-container:not(.hidden) {
+/* ADDED: Visibility class for override container */
+#override-container.visible {
     opacity: 1;
-    pointer-events: all;
+    pointer-events: auto;
 }
 
+/* MODIFIED: Add padding to the bottom of the content to avoid the footer */
 .override-content {
     text-align: center;
     max-width: 1000px;
     padding: 2rem;
+    padding-bottom: 180px; /* ADDED: Ensures space for the footer below */
     animation: fadeInUp 0.8s ease forwards;
+}
+
+/* --- ADDED: Styles for the new Override Footer --- */
+.override-footer {
+    position: absolute; /* Pin the footer to the bottom of the screen */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    border-top: 1px solid var(--color-border);
+    background: rgba(0, 0, 0, 0.2); /* A subtle background to lift it off the overlay */
+    
+    /* Add a delayed animation so it appears after the question */
+    opacity: 0;
+    animation: fadeInUp 1s ease 0.5s forwards;
+}
+
+/* Reuse existing styles for the QR code and text */
+.override-footer .qr-code img {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+}
+
+.override-footer .cta-text h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.override-footer .cta-text p {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
 }
 
 .override-theme {
@@ -480,5 +839,191 @@ body.presenter-mode {
     font-size: 2.8rem;
     font-weight: 600;
     line-height: 1.4;
+    color: var(--color-text-primary);
+}
+
+/* ENHANCED: VS-Style Battle Poll Visualization */
+.poll-vs-container {
+    width: 100%;
+    max-width: 1100px;
+    padding: 1rem;
+    animation: fadeInUp 0.6s ease;
+}
+
+.poll-question-text {
+    font-size: 1.8rem;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.4;
+    margin-bottom: 3rem;
+    color: var(--color-text-primary);
+}
+
+.vs-battle {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: stretch;
+    margin-bottom: 2rem;
+}
+
+.vs-side {
+    background: rgba(20, 24, 34, 0.6);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    position: relative;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.vs-side.winner {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+}
+
+.vs-side.yes-side {
+    border-color: var(--color-accent-green);
+}
+
+.vs-side.yes-side.winner {
+    background: rgba(45, 211, 111, 0.1);
+    border-color: var(--color-accent-green);
+    box-shadow: 0 0 30px rgba(45, 211, 111, 0.4);
+}
+
+.vs-side.no-side {
+    border-color: var(--color-accent-orange);
+}
+
+.vs-side.no-side.winner {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: var(--color-accent-orange);
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+}
+
+.vs-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: scaleIn 0.5s ease;
+}
+
+.yes-side .vs-icon {
+    color: var(--color-accent-green);
+}
+
+.no-side .vs-icon {
+    color: var(--color-accent-orange);
+}
+
+.vs-label {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+.yes-side .vs-label {
+    color: var(--color-accent-green);
+}
+
+.no-side .vs-label {
+    color: var(--color-accent-orange);
+}
+
+.vs-percentage {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    margin: 1rem 0;
+    animation: countUp 1s ease;
+}
+
+.yes-side .vs-percentage {
+    color: var(--color-accent-green);
+}
+
+.no-side .vs-percentage {
+    color: var(--color-accent-orange);
+}
+
+.vs-votes {
+    font-size: 1.3rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.vs-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vs-text {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--color-text-secondary);
+    background: linear-gradient(45deg, var(--color-accent-cyan), var(--color-accent-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.1em;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.poll-total-responses {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    margin-top: 1rem;
+}
+
+.poll-total-responses strong {
+    color: var(--color-accent-cyan);
+    font-size: 1.5rem;
+}
+
+/* Animations for VS Battle */
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+.poll-bar-percent {
+    font-size: 2rem;
+    font-weight: 600;
     color: var(--color-text-primary);
 }

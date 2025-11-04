@@ -91,6 +91,90 @@ class VisualizationManager {
         return html;
     }
 
+    // ADDED: New method for Top Rising Terms (as an additional view)
+    renderRisingTermsForPresenter(submissions) {
+        if (submissions.length === 0) return '<h2>Waiting for approved submissions...</h2>';
+
+        // Extract and normalize terms
+        const allTerms = submissions.flatMap(s =>
+            (s.keyTerms.map(kt => kt.term)).concat(s.keyPhrases || [])
+        );
+
+        const cleanedTerms = allTerms.map(term =>
+            term.replace(/[^\p{L}\p{N}\s-]/gu, '').trim()
+        ).filter(term => term.length > 0);
+
+        const normalizedTerms = cleanedTerms.map(term => this.normalizeTerm(term));
+
+        // Count terms
+        const termCounts = new Map();
+        normalizedTerms.forEach(term => {
+            const lowerTerm = term.toLowerCase();
+            const existing = termCounts.get(lowerTerm);
+            if (existing) {
+                existing.count++;
+            } else {
+                termCounts.set(lowerTerm, { displayTerm: term, count: 1 });
+            }
+        });
+
+        // Boost multi-word phrases
+        const multiWordPhrases = submissions.flatMap(s => s.keyPhrases || [])
+            .map(p => p.replace(/[^\p{L}\p{N}\s-]/gu, '').trim())
+            .filter(p => p.length > 0)
+            .map(p => this.normalizeTerm(p));
+
+        multiWordPhrases.forEach(phrase => {
+            if (phrase.includes(' ')) {
+                const lowerPhrase = phrase.toLowerCase();
+                const existing = termCounts.get(lowerPhrase);
+                if (existing) {
+                    existing.count += 0.5;
+                }
+            }
+        });
+
+        // Get top 6 (optimized for no-scroll layout)
+        const topTerms = Array.from(termCounts.values())
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 6);
+
+        if (topTerms.length === 0) return '<h2>Not enough data for key terms yet...</h2>';
+
+        const maxCount = topTerms[0].count;
+
+        let html = '<div class="rising-terms-container">';
+        html += '<div class="rising-terms-list">';
+
+        topTerms.forEach((item, index) => {
+            const { displayTerm, count } = item;
+            const percentage = (count / maxCount) * 100;
+            const rank = index + 1;
+
+            // Medal for top 3
+            let medal = '';
+            if (rank === 1) medal = '🥇';
+            else if (rank === 2) medal = '🥈';
+            else if (rank === 3) medal = '🥉';
+
+            html += `
+                <div class="rising-term-item" style="animation-delay: ${index * 0.1}s">
+                    <div class="term-rank">${medal || `#${rank}`}</div>
+                    <div class="term-content">
+                        <div class="term-name">${displayTerm}</div>
+                        <div class="term-bar-container">
+                            <div class="term-bar" style="width: ${percentage}%;"></div>
+                        </div>
+                    </div>
+                    <div class="term-count">${Math.round(count)}</div>
+                </div>
+            `;
+        });
+
+        html += '</div></div>';
+        return html;
+    }
+
     // MODIFIED: Replaced the entire method to add a punctuation cleaning step
     renderWordCloudForPresenter(submissions) {
         if (submissions.length === 0) return '<h2>Waiting for approved submissions...</h2>';
@@ -210,51 +294,81 @@ class VisualizationManager {
             return '<h2>Waiting for more data to generate insights...</h2>';
         }
 
-        let html = '<div class="summary-panel executive-briefing">';
+        let html = '<div class="insights-highlights-container">';
+        let cardCount = 0;
+        const maxCards = 4; // Limit to 4 cards for optimal viewport fit
 
-        // --- Section 1: Sentiment Hotspots ---
-        if (insights.sentimentHotspots.positive || insights.sentimentHotspots.concern) {
-            html += `<div class="insight-card">
-                        <h4 class="insight-title">Sentiment Hotspots</h4>`;
-            if (insights.sentimentHotspots.positive) {
-                html += `<div class="hotspot positive">
-                            <span class="hotspot-icon">👍</span>
-                            <div><strong>Most Positive Topic:</strong> ${insights.sentimentHotspots.positive}</div>
-                         </div>`;
-            }
-            if (insights.sentimentHotspots.concern) {
-                html += `<div class="hotspot concern">
-                            <span class="hotspot-icon">🤔</span>
-                            <div><strong>Top Area of Concern:</strong> ${insights.sentimentHotspots.concern}</div>
-                         </div>`;
-            }
-            html += `</div>`;
+        // --- Top Excitement (Most Positive Topic) ---
+        if (insights.sentimentHotspots.positive && cardCount < maxCards) {
+            html += `
+                <div class="highlight-card excitement">
+                    <div class="highlight-icon">🎉</div>
+                    <div class="highlight-label">Top Excitement</div>
+                    <div class="highlight-topic">${insights.sentimentHotspots.positive}</div>
+                </div>
+            `;
+            cardCount++;
         }
 
-        // --- Section 2: Key Discussion Points ---
+        // --- Top Concern ---
+        if (insights.sentimentHotspots.concern && cardCount < maxCards) {
+            html += `
+                <div class="highlight-card concern">
+                    <div class="highlight-icon">🤔</div>
+                    <div class="highlight-label">Top Concern</div>
+                    <div class="highlight-topic">${insights.sentimentHotspots.concern}</div>
+                </div>
+            `;
+            cardCount++;
+        }
+
+        // --- Trending Topics (Key Discussion Points) ---
         if (insights.keyDiscussionPoints.length > 0) {
-            html += `<div class="insight-card">
-                        <h4 class="insight-title">Key Discussion Points</h4>`;
-            insights.keyDiscussionPoints.forEach(topic => {
-                html += `<div class="discussion-point">
-                            <h5>${topic.name} (${topic.count} submissions)</h5>
-                            <blockquote class="representative-quote">“${topic.example}”</blockquote>
-                         </div>`;
+            // Take top 1-2 discussion points based on remaining space
+            const remaining = maxCards - cardCount;
+            const topDiscussions = insights.keyDiscussionPoints.slice(0, Math.min(remaining, 2));
+            topDiscussions.forEach((topic, index) => {
+                const icons = ['💡', '🔥', '⚡', '🎯'];
+                const icon = icons[index % icons.length];
+                html += `
+                    <div class="highlight-card trending">
+                        <div class="highlight-icon">${icon}</div>
+                        <div class="highlight-label">Trending Topic</div>
+                        <div class="highlight-topic">${topic.name}</div>
+                        <div class="highlight-count">${topic.count} mentions</div>
+                    </div>
+                `;
+                cardCount++;
             });
-            html += `</div>`;
         }
 
-        // --- Section 3: Emerging Concepts ---
-        if (insights.emergingConcepts.length > 0) {
-            html += `<div class="insight-card">
-                        <h4 class="insight-title">🔥 Emerging Concepts</h4>`;
-            insights.emergingConcepts.forEach(concept => {
-                html += `<div class="discussion-point">
-                            <h5>${concept.phrase} (mentioned ${concept.count} times)</h5>
-                            <blockquote class="representative-quote">“${concept.example}”</blockquote>
-                         </div>`;
+        // --- Emerging Concepts (only if space available) ---
+        if (insights.emergingConcepts.length > 0 && cardCount < maxCards) {
+            const remaining = maxCards - cardCount;
+            const topConcepts = insights.emergingConcepts.slice(0, Math.min(remaining, 1));
+            topConcepts.forEach(concept => {
+                html += `
+                    <div class="highlight-card emerging">
+                        <div class="highlight-icon">🚀</div>
+                        <div class="highlight-label">Emerging Concept</div>
+                        <div class="highlight-topic">${concept.phrase}</div>
+                        <div class="highlight-count">${concept.count}x mentioned</div>
+                    </div>
+                `;
+                cardCount++;
             });
-            html += `</div>`;
+        }
+
+        // --- Representative Quote (shorter, if available) ---
+        if (insights.keyDiscussionPoints.length > 0 && insights.keyDiscussionPoints[0].example) {
+            const quote = insights.keyDiscussionPoints[0].example;
+            const truncatedQuote = quote.length > 80 ? quote.substring(0, 80) + '...' : quote;
+            html += `
+                <div class="highlight-quote-card">
+                    <div class="quote-icon">💬</div>
+                    <div class="quote-text">"${truncatedQuote}"</div>
+                </div>
+            `;
         }
 
         html += '</div>';
@@ -344,28 +458,160 @@ class VisualizationManager {
     }
 
     renderSentimentOverviewForPresenter(submissions) {
-        // ... (this method remains unchanged) ...
         if (submissions.length === 0) return '<h2>Waiting for approved submissions...</h2>';
-        const sentimentCounts = submissions.reduce((acc, s) => { acc[s.sentiment] = (acc[s.sentiment] || 0) + 1; return acc; }, { positive: 0, neutral: 0, negative: 0, concern: 0 });
+
+        const sentimentCounts = submissions.reduce((acc, s) => {
+            acc[s.sentiment] = (acc[s.sentiment] || 0) + 1;
+            return acc;
+        }, { positive: 0, neutral: 0, negative: 0, concern: 0 });
+
         const total = submissions.length;
         const positivePercent = total > 0 ? Math.round((sentimentCounts.positive / total) * 100) : 0;
         const negativePercent = total > 0 ? Math.round((sentimentCounts.negative / total) * 100) : 0;
         const concernPercent = total > 0 ? Math.round((sentimentCounts.concern / total) * 100) : 0;
         const neutralPercent = 100 - positivePercent - negativePercent - concernPercent;
-        let html = `<div class="sentiment-overview">
-            <div class="sentiment-bar">
-                <div class="sentiment-fill positive" style="width: ${positivePercent}%">${positivePercent > 5 ? `${positivePercent}%` : ''}</div>
-                <div class="sentiment-fill concern" style="width: ${concernPercent}%">${concernPercent > 5 ? `${concernPercent}%` : ''}</div>
-                <div class="sentiment-fill negative" style="width: ${negativePercent}%">${negativePercent > 5 ? `${negativePercent}%` : ''}</div>
-                <div class="sentiment-fill neutral" style="width: ${neutralPercent}%">${neutralPercent > 5 ? `${neutralPercent}%` : ''}</div>
+
+        // Calculate overall sentiment score (-100 to +100)
+        // Positive = +1, Neutral = 0, Concern = -0.5, Negative = -1
+        const sentimentScore = (
+            (sentimentCounts.positive * 1) +
+            (sentimentCounts.neutral * 0) +
+            (sentimentCounts.concern * -0.5) +
+            (sentimentCounts.negative * -1)
+        ) / total * 100;
+
+        // Determine needle position (0-180 degrees for semicircle)
+        // -100 = 0deg (left), 0 = 90deg (center), +100 = 180deg (right)
+        const needleAngle = ((sentimentScore + 100) / 200) * 180;
+
+        // Determine mood label and emoji
+        let moodLabel = 'Neutral';
+        let moodEmoji = '😐';
+        let moodColor = 'var(--color-text-secondary)';
+
+        if (sentimentScore >= 50) {
+            moodLabel = 'Very Positive';
+            moodEmoji = '😃';
+            moodColor = 'var(--color-accent-green)';
+        } else if (sentimentScore >= 20) {
+            moodLabel = 'Positive';
+            moodEmoji = '🙂';
+            moodColor = 'var(--color-accent-green)';
+        } else if (sentimentScore >= -20) {
+            moodLabel = 'Mixed';
+            moodEmoji = '😐';
+            moodColor = 'var(--color-text-secondary)';
+        } else if (sentimentScore >= -50) {
+            moodLabel = 'Concerned';
+            moodEmoji = '😕';
+            moodColor = 'var(--color-accent-orange)';
+        } else {
+            moodLabel = 'Very Concerned';
+            moodEmoji = '😟';
+            moodColor = 'var(--color-accent-red)';
+        }
+
+        let html = `
+            <div class="sentiment-gauge-container">
+                <h3 class="gauge-title">Audience Mood</h3>
+
+                <div class="gauge-wrapper">
+                    <svg class="sentiment-gauge" viewBox="0 0 200 120" width="400" height="240">
+                        <!-- Background arc zones -->
+                        <path d="M 20 100 A 80 80 0 0 1 60 35"
+                              fill="none" stroke="var(--color-accent-red)" stroke-width="20" opacity="0.3"/>
+                        <path d="M 60 35 A 80 80 0 0 1 100 20"
+                              fill="none" stroke="var(--color-accent-orange)" stroke-width="20" opacity="0.3"/>
+                        <path d="M 100 20 A 80 80 0 0 1 140 35"
+                              fill="none" stroke="var(--color-text-secondary)" stroke-width="20" opacity="0.3"/>
+                        <path d="M 140 35 A 80 80 0 0 1 180 100"
+                              fill="none" stroke="var(--color-accent-green)" stroke-width="20" opacity="0.3"/>
+
+                        <!-- Needle -->
+                        <g class="gauge-needle" style="transform-origin: 100px 100px; transform: rotate(${needleAngle}deg);">
+                            <line x1="100" y1="100" x2="100" y2="35"
+                                  stroke="${moodColor}" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="100" cy="100" r="8" fill="${moodColor}"/>
+                        </g>
+                    </svg>
+
+                    <div class="gauge-center">
+                        <div class="gauge-emoji">${moodEmoji}</div>
+                        <div class="gauge-label" style="color: ${moodColor};">${moodLabel}</div>
+                        <div class="gauge-score">${sentimentScore > 0 ? '+' : ''}${Math.round(sentimentScore)}</div>
+                    </div>
+                </div>
+
+                <div class="sentiment-breakdown">
+                    <div class="breakdown-item positive">
+                        <div class="breakdown-icon">😃</div>
+                        <div class="breakdown-label">Positive</div>
+                        <div class="breakdown-value">${positivePercent}%</div>
+                        <div class="breakdown-count">${sentimentCounts.positive}</div>
+                    </div>
+                    <div class="breakdown-item neutral">
+                        <div class="breakdown-icon">😐</div>
+                        <div class="breakdown-label">Neutral</div>
+                        <div class="breakdown-value">${neutralPercent}%</div>
+                        <div class="breakdown-count">${sentimentCounts.neutral}</div>
+                    </div>
+                    <div class="breakdown-item concern">
+                        <div class="breakdown-icon">🤔</div>
+                        <div class="breakdown-label">Concern</div>
+                        <div class="breakdown-value">${concernPercent}%</div>
+                        <div class="breakdown-count">${sentimentCounts.concern}</div>
+                    </div>
+                    <div class="breakdown-item negative">
+                        <div class="breakdown-icon">😟</div>
+                        <div class="breakdown-label">Negative</div>
+                        <div class="breakdown-value">${negativePercent}%</div>
+                        <div class="breakdown-count">${sentimentCounts.negative}</div>
+                    </div>
+                </div>
             </div>
-            <div class="sentiment-legend">
-                <div class="legend-item positive"><span></span>Positive (${sentimentCounts.positive})</div>
-                <div class="legend-item concern"><span></span>Concern (${sentimentCounts.concern})</div>
-                <div class="legend-item negative"><span></span>Negative (${sentimentCounts.negative})</div>
-                <div class="legend-item neutral"><span></span>Neutral (${sentimentCounts.neutral})</div>
+        `;
+        return html;
+    }
+    // ENHANCED: VS-Style Battle renderer for the Yes/No poll results
+    renderPollResultsForPresenter(questionText, yesCount, noCount) {
+        const total = yesCount + noCount;
+        if (total === 0) {
+            return `<h2>${questionText}</h2><p>Waiting for poll responses...</p>`;
+        }
+
+        const yesPercent = Math.round((yesCount / total) * 100);
+        const noPercent = 100 - yesPercent;
+        const winner = yesPercent > noPercent ? 'yes' : (noPercent > yesPercent ? 'no' : 'tie');
+
+        let html = `
+            <div class="poll-vs-container">
+                <h2 class="poll-question-text">${questionText}</h2>
+
+                <div class="vs-battle">
+                    <div class="vs-side yes-side ${winner === 'yes' ? 'winner' : ''}">
+                        <div class="vs-icon">✓</div>
+                        <div class="vs-label">YES</div>
+                        <div class="vs-percentage">${yesPercent}%</div>
+                        <div class="vs-votes">${yesCount} vote${yesCount !== 1 ? 's' : ''}</div>
+                    </div>
+
+                    <div class="vs-divider">
+                        <div class="vs-text">VS</div>
+                    </div>
+
+                    <div class="vs-side no-side ${winner === 'no' ? 'winner' : ''}">
+                        <div class="vs-icon">✗</div>
+                        <div class="vs-label">NO</div>
+                        <div class="vs-percentage">${noPercent}%</div>
+                        <div class="vs-votes">${noCount} vote${noCount !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+
+                <div class="poll-total-responses">
+                    Total Responses: <strong>${total}</strong>
+                </div>
             </div>
-        </div>`;
+        `;
         return html;
     }
 }
