@@ -175,20 +175,64 @@ class VisualizationManager {
         return html;
     }
 
-    // MODIFIED: Replaced the entire method to add a punctuation cleaning step
+    // MODIFIED: Enhanced with intelligent filtering for presentation
     renderWordCloudForPresenter(submissions) {
         if (submissions.length === 0) return '<h2>Waiting for approved submissions...</h2>';
 
+        // Whitelist of important acronyms and technical terms that should NEVER be filtered
+        const importantTerms = new Set([
+            'ai', 'it', 'ml', 'iot', 'api', 'ui', 'ux', 'ar', 'vr', 'xr',
+            'bi', 'ci', 'cd', 'qa', 'hr', 'pr', 'roi', 'kpi', 'erp', 'crm',
+            'nlp', 'llm', 'gpt', 'aws', 'sap', 'oss', 'sdk', 'ide',
+            'we', 'us', 'our' // Organizational identity terms - can be meaningful
+        ]);
+
+        // Minimal stop words - only filter truly meaningless terms
+        // Trust frequency-based ranking to surface important terms naturally
+        const stopWords = new Set([
+            'a', 'an', 'the', 'and', 'or', 'but', 'if', 'as', 'at', 'by',
+            'for', 'with', 'about', 'into', 'to', 'from', 'in', 'on',
+            'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+            'this', 'that', 'these', 'those',
+            'there', 'here', 'when', 'where', 'why', 'how'
+        ]);
+
         // Step 1: Extract all raw terms and phrases from submissions
-        const allTerms = submissions.flatMap(s => 
+        const allTerms = submissions.flatMap(s =>
             (s.keyTerms.map(kt => kt.term)).concat(s.keyPhrases || [])
         );
 
-        // ADDED STEP 2: Clean every term to remove punctuation for this visualization ONLY.
-        // This regex removes any character that is NOT a Unicode letter, number, whitespace, or hyphen.
-        const cleanedTerms = allTerms.map(term => 
-            term.replace(/[^\p{L}\p{N}\s-]/gu, '').trim()
-        ).filter(term => term.length > 0); // Also filter out any empty strings that might result
+        // Step 2: Clean and intelligently filter terms
+        const cleanedTerms = allTerms
+            .map(term => term.replace(/[^\p{L}\p{N}\s-]/gu, '').trim())
+            .filter(term => {
+                if (term.length === 0) return false;
+
+                const lowerTerm = term.toLowerCase();
+                const wordCount = term.split(/\s+/).length;
+
+                // ALWAYS keep whitelisted important terms
+                if (wordCount === 1 && importantTerms.has(lowerTerm)) return true;
+
+                // Filter out very long phrases (likely sentence fragments)
+                if (wordCount > 4) return false;
+
+                // Filter single-word stop words (but multi-word phrases are OK)
+                if (wordCount === 1 && stopWords.has(lowerTerm)) return false;
+
+                // Filter very short words unless they're uppercase acronyms or whitelisted
+                if (term.length <= 2 && term !== term.toUpperCase() && !importantTerms.has(lowerTerm)) {
+                    return false;
+                }
+
+                // Filter phrases that start or end with stop words (but not whitelisted terms)
+                const words = term.toLowerCase().split(/\s+/);
+                const startsWithStopWord = stopWords.has(words[0]) && !importantTerms.has(words[0]);
+                const endsWithStopWord = stopWords.has(words[words.length - 1]) && !importantTerms.has(words[words.length - 1]);
+                if (startsWithStopWord || endsWithStopWord) return false;
+
+                return true;
+            });
 
         // Step 3: Normalize the cleaned terms (e.g., 'ml' -> 'Machine Learning')
         const normalizedTerms = cleanedTerms.map(term => this.normalizeTerm(term));
@@ -221,67 +265,132 @@ class VisualizationManager {
             }
         });
 
-        // Step 6: Sort, slice, and render the final word cloud
+        // Step 6: Sort, slice, and render with enhanced visual hierarchy
         const sorted = Array.from(termCounts.values())
             .sort((a, b) => b.count - a.count)
-            .slice(0, 30);
-        
+            .slice(0, 20); // Reduced from 30 to 20 for less clutter
+
         if (sorted.length === 0) return '<h2>Not enough data for key terms yet...</h2>';
 
         const maxCount = sorted[0].count;
         const minCount = sorted[sorted.length - 1].count;
 
         let html = '<div id="word-cloud-area" class="word-cloud-container">';
-        sorted.forEach(item => {
+        html += '<div class="word-cloud-inner">';
+        sorted.forEach((item, index) => {
             const { displayTerm, count } = item;
+
+            // Linear normalization (0 to 1)
             const normalizedCount = (count - minCount) / (maxCount - minCount + 1);
-            const fontSizeRem = 1 + normalizedCount * 3.5;
-            const fontWeight = (normalizedCount > 0.7) ? 600 : 400;
+
+            // ENHANCED: Use exponential scaling for more dramatic size differences
+            // This makes the top terms MUCH larger while keeping smaller terms readable
+            const exponentialScale = Math.pow(normalizedCount, 0.6);
+
+            // ADJUSTED: Smaller font size range to fit better (1.2rem to 5rem for better containment)
+            const fontSizeRem = 1.2 + exponentialScale * 3.8;
+
+            // ENHANCED: Stronger weight for top terms
+            let fontWeight = 300;
+            if (index < 3) fontWeight = 700; // Top 3 are bold
+            else if (index < 7) fontWeight = 600; // Top 4-7 are semi-bold
+            else if (exponentialScale > 0.5) fontWeight = 500; // Mid-tier terms
+
+            // ENHANCED: More selective color coding - only top terms get vibrant colors
             let colorClass = 't-secondary';
-            if (normalizedCount > 0.8) colorClass = 't-cyan';
-            else if (normalizedCount > 0.5) colorClass = 't-orange';
-            else if (normalizedCount > 0.2) colorClass = 't-primary';
-            const formattedTerm = displayTerm.replace(/ /g, '\u00A0'); // Use non-breaking space
+            if (index === 0) colorClass = 't-cyan'; // #1 is bright cyan
+            else if (index < 3) colorClass = 't-orange'; // #2-3 are orange
+            else if (index < 8) colorClass = 't-primary'; // #4-8 are primary
+            // Rest stay secondary (more subtle)
+
+            const formattedTerm = displayTerm.replace(/ /g, '\u00A0'); // Non-breaking space
             html += `<span class="cloud-word ${colorClass}" style="font-size: ${fontSizeRem.toFixed(2)}rem; font-weight: ${fontWeight};">${formattedTerm}</span>`;
         });
-        html += '</div>';
+        html += '</div>'; // Close word-cloud-inner
+        html += '</div>'; // Close word-cloud-container
         return html;
     }
 
     initializeWordCloudLayout() {
-        // ... (this method remains unchanged) ...
         const container = document.getElementById('word-cloud-area');
         if (!container) return;
-        const words = Array.from(container.getElementsByClassName('cloud-word'));
-        const containerRect = container.getBoundingClientRect();
+
+        // Get the inner container for positioning
+        const innerContainer = container.querySelector('.word-cloud-inner');
+        if (!innerContainer) return;
+
+        const words = Array.from(innerContainer.getElementsByClassName('cloud-word'));
+        const containerRect = innerContainer.getBoundingClientRect();
         const centerX = containerRect.width / 2;
         const centerY = containerRect.height / 2;
+
+        // Define safe margins to keep words within bounds
+        const margin = 20;
+        const maxX = containerRect.width - margin;
+        const maxY = containerRect.height - margin;
+
         const placedRects = [];
+
         const checkCollision = (rect1, rect2) => {
-            const padding = 5;
-            return (rect1.x < rect2.x + rect2.width + padding && rect1.x + rect1.width + padding > rect2.x && rect1.y < rect2.y + rect2.height + padding && rect1.y + rect1.height + padding > rect2.y);
+            const padding = 8;
+            return (rect1.x < rect2.x + rect2.width + padding &&
+                    rect1.x + rect1.width + padding > rect2.x &&
+                    rect1.y < rect2.y + rect2.height + padding &&
+                    rect1.y + rect1.height + padding > rect2.y);
         };
+
+        const isWithinBounds = (word) => {
+            return word.x >= margin &&
+                   word.y >= margin &&
+                   word.x + word.width <= maxX &&
+                   word.y + word.height <= maxY;
+        };
+
         words.forEach((wordEl, index) => {
             const wordRect = wordEl.getBoundingClientRect();
             const currentWord = { width: wordRect.width, height: wordRect.height };
+
             if (index === 0) {
+                // Place first word at center
                 currentWord.x = centerX - currentWord.width / 2;
                 currentWord.y = centerY - currentWord.height / 2;
             } else {
                 let angle = Math.random() * 2 * Math.PI;
-                let radius = 0.2 * Math.max(containerRect.width, containerRect.height);
+                let radius = 0.15 * Math.min(containerRect.width, containerRect.height); // Start smaller
                 let foundPosition = false;
-                for (let i = 0; i < 250; i++) {
-                    radius += 2; angle += 0.3;
+
+                for (let i = 0; i < 300; i++) {
+                    radius += 1.5; // Slower growth
+                    angle += 0.25;
+
                     const x = centerX + radius * Math.cos(angle) - currentWord.width / 2;
                     const y = centerY + radius * Math.sin(angle) - currentWord.height / 2;
-                    currentWord.x = x; currentWord.y = y;
-                    let isColliding = false;
-                    for (const placed of placedRects) { if (checkCollision(currentWord, placed)) { isColliding = true; break; } }
-                    if (!isColliding) { foundPosition = true; break; }
+
+                    currentWord.x = x;
+                    currentWord.y = y;
+
+                    // Check if within bounds AND not colliding
+                    if (isWithinBounds(currentWord)) {
+                        let isColliding = false;
+                        for (const placed of placedRects) {
+                            if (checkCollision(currentWord, placed)) {
+                                isColliding = true;
+                                break;
+                            }
+                        }
+                        if (!isColliding) {
+                            foundPosition = true;
+                            break;
+                        }
+                    }
                 }
-                if (!foundPosition) { wordEl.style.display = 'none'; return; }
+
+                if (!foundPosition) {
+                    wordEl.style.display = 'none';
+                    return;
+                }
             }
+
             placedRects.push(currentWord);
             wordEl.style.left = `${currentWord.x}px`;
             wordEl.style.top = `${currentWord.y}px`;
@@ -513,10 +622,8 @@ class VisualizationManager {
 
         let html = `
             <div class="sentiment-gauge-container">
-                <h3 class="gauge-title">Audience Mood</h3>
-
                 <div class="gauge-wrapper">
-                    <svg class="sentiment-gauge" viewBox="0 0 200 120" width="400" height="240">
+                    <svg class="sentiment-gauge" viewBox="0 0 200 120" width="100%" height="auto" style="max-width: 500px; max-height: 300px;">
                         <!-- Background arc zones -->
                         <path d="M 20 100 A 80 80 0 0 1 60 35"
                               fill="none" stroke="var(--color-accent-red)" stroke-width="20" opacity="0.3"/>
